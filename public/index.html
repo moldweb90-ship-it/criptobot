@@ -31,7 +31,7 @@
       display: grid;
       grid-template-columns: repeat(6, 1fr);
       gap: 15px;
-      margin: 0 auto;
+      margin: 30px auto 0;
     }
 
     .crypto-card {
@@ -465,12 +465,223 @@
       background: #f7fafc;
       border: 1px solid #e2e8f0;
     }
+
+    /* Торговые сигналы */
+    .signals-section {
+      margin-top: 30px;
+      width: 100%;
+      display: flex;
+      gap: 20px;
+    }
+
+    .signals-container {
+      flex: 1;
+      width: 50%;
+    }
+
+    .positions-container {
+      flex: 1;
+      width: 50%;
+    }
+
+    .signals-title, .positions-title, .market-title {
+      text-align: center;
+      color: white;
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      letter-spacing: 1px;
+    }
+
+    .analytics-title {
+      text-align: center;
+      color: #2d3748;
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-shadow: none;
+      letter-spacing: 1px;
+    }
+
+    .market-section {
+      margin-top: 30px;
+      width: 100%;
+    }
+
+    .positions-content {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 20px;
+      min-height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #718096;
+      font-size: 16px;
+    }
+
+    .signals-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .signal-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .signal-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .signal-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .signal-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #2d3748;
+    }
+
+    .signal-badge {
+      margin-left: auto;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .signal-badge.buy {
+      background: #48bb78;
+      color: white;
+    }
+
+    .signal-badge.sell {
+      background: #f56565;
+      color: white;
+    }
+
+    .signal-badge.hold {
+      background: #ecc94b;
+      color: #2d3748;
+    }
+
+    .confidence-bar {
+      margin: 10px 0;
+    }
+
+    .confidence-label {
+      font-size: 10px;
+      color: #718096;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .confidence-progress {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .confidence-fill {
+      height: 100%;
+      transition: width 0.5s ease, background 0.3s ease;
+      border-radius: 4px;
+    }
+
+    .confidence-fill.high {
+      background: linear-gradient(90deg, #48bb78, #38a169);
+    }
+
+    .confidence-fill.medium {
+      background: linear-gradient(90deg, #ecc94b, #d69e2e);
+    }
+
+    .confidence-fill.low {
+      background: linear-gradient(90deg, #cbd5e0, #a0aec0);
+    }
+
+    .signal-metrics {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .signal-metric {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      padding: 4px 8px;
+      background: #f7fafc;
+      border-radius: 4px;
+    }
+
+    .signal-metric-label {
+      color: #718096;
+      font-weight: 500;
+    }
+
+    .signal-metric-value {
+      font-weight: 700;
+      color: #2d3748;
+    }
+
+    .signal-metric-value.green {
+      color: #38a169;
+    }
+
+    .signal-metric-value.red {
+      color: #e53e3e;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="crypto-grid" id="cryptoGrid">
-      <!-- Криптовалюты будут добавлены через JavaScript -->
+    <!-- Секция торговых сигналов и позиций -->
+    <div class="signals-section">
+      <div class="signals-container">
+        <h2 class="signals-title">🎯 Торговые сигналы</h2>
+        <div class="signals-grid" id="signalsGrid">
+          <!-- Сигналы будут добавлены через JavaScript -->
+        </div>
+      </div>
+      
+      <div class="positions-container">
+        <h2 class="positions-title">📊 Открытые позиции</h2>
+        <div class="positions-content">
+          Позиции будут отображаться здесь
+        </div>
+      </div>
+    </div>
+
+    <!-- Рыночные данные -->
+    <div class="market-section">
+      <h2 class="market-title">💰 Рыночные данные</h2>
+      <div class="crypto-grid" id="cryptoGrid">
+        <!-- Криптовалюты будут добавлены через JavaScript -->
+      </div>
     </div>
 
     <!-- Секция аналитики -->
@@ -486,6 +697,7 @@
     const ws = new WebSocket('ws://localhost:5000');
     const cryptoGrid = document.getElementById('cryptoGrid');
     const analyticsGrid = document.getElementById('analyticsGrid');
+    const signalsGrid = document.getElementById('signalsGrid');
     const lastPrices = {};
     
     // Конфигурация криптовалют
@@ -507,6 +719,10 @@
       // Создаем аналитическую карточку
       const analyticsCard = createAnalyticsCard(symbol, config);
       analyticsGrid.appendChild(analyticsCard);
+
+      // Создаем карточку торговых сигналов
+      const signalCard = createSignalCard(symbol, config);
+      signalsGrid.appendChild(signalCard);
     });
 
     function createCryptoCard(symbol, config) {
@@ -627,6 +843,51 @@
         <div class="indicator">
           <div class="indicator-label">Bid/Ask Ratio</div>
           <div class="indicator-value" id="bid-ask-ratio-${symbol}">--</div>
+        </div>
+      `;
+      
+      return card;
+    }
+
+    function createSignalCard(symbol, config) {
+      const card = document.createElement('div');
+      card.className = 'signal-card';
+      card.id = `signal-${symbol}`;
+      
+      card.innerHTML = `
+        <div class="signal-header">
+          <div class="signal-icon ${config.class}">${config.symbol}</div>
+          <div class="signal-name">${config.name}</div>
+          <div class="signal-badge hold" id="signal-badge-${symbol}">HOLD</div>
+        </div>
+        
+        <div class="confidence-bar">
+          <div class="confidence-label">
+            <span>Confidence</span>
+            <span id="confidence-value-${symbol}">0%</span>
+          </div>
+          <div class="confidence-progress">
+            <div class="confidence-fill low" id="confidence-fill-${symbol}" style="width: 0%"></div>
+          </div>
+        </div>
+        
+        <div class="signal-metrics">
+          <div class="signal-metric">
+            <span class="signal-metric-label">Entry</span>
+            <span class="signal-metric-value" id="entry-${symbol}">--</span>
+          </div>
+          <div class="signal-metric">
+            <span class="signal-metric-label">TP</span>
+            <span class="signal-metric-value green" id="tp-${symbol}">--</span>
+          </div>
+          <div class="signal-metric">
+            <span class="signal-metric-label">SL</span>
+            <span class="signal-metric-value red" id="sl-${symbol}">--</span>
+          </div>
+          <div class="signal-metric">
+            <span class="signal-metric-label">R:R</span>
+            <span class="signal-metric-value" id="rr-${symbol}">--</span>
+          </div>
         </div>
       `;
       
@@ -775,6 +1036,162 @@
       element.className = `indicator-value ${cssClass}`;
     }
 
+    function updateSignalCard(symbol, data) {
+      const analytics = data.analytics;
+      const orderBook = data.orderBook;
+      const spotPrice = data.spot.price;
+      
+      if (!analytics || !orderBook) return;
+
+      console.log(`🎯 Calculating signal for ${symbol}:`, {
+        ema9: analytics.ema9,
+        ema21: analytics.ema21,
+        ema50: analytics.ema50,
+        rsi: analytics.rsi,
+        macd: analytics.macd,
+        volumeRatio: analytics.volumeRatio
+      });
+
+      // Расчет confidence для LONG
+      let longScore = 0;
+
+      // EMA структура (20 баллов)
+      if (analytics.ema9 > analytics.ema21 && analytics.ema21 > analytics.ema50) {
+        longScore += 20;
+      }
+
+      // MACD (15 баллов)
+      if (analytics.macd && analytics.macd.macd > analytics.macd.signal && analytics.macd.histogram > 0) {
+        longScore += 15;
+      }
+
+      // RSI (10 баллов)
+      if (analytics.rsi >= 45 && analytics.rsi <= 70) {
+        longScore += 10;
+      } else if ((analytics.rsi >= 40 && analytics.rsi < 45) || (analytics.rsi > 70 && analytics.rsi <= 75)) {
+        longScore += 5;
+      }
+
+      // Volume Ratio (15 баллов)
+      if (analytics.volumeRatio >= 1.30) {
+        longScore += 15;
+      } else if (analytics.volumeRatio >= 1.00) {
+        longScore += 8;
+      }
+
+      // Бонусы
+      if (analytics.volumeRatio >= 1.50) {
+        longScore += 10;
+      }
+
+      // Расчет confidence для SHORT
+      let shortScore = 0;
+
+      // EMA структура (20 баллов)
+      if (analytics.ema9 < analytics.ema21 && analytics.ema21 < analytics.ema50) {
+        shortScore += 20;
+      }
+
+      // MACD (15 баллов)
+      if (analytics.macd && analytics.macd.macd < analytics.macd.signal && analytics.macd.histogram < 0) {
+        shortScore += 15;
+      }
+
+      // RSI (10 баллов)
+      if (analytics.rsi >= 25 && analytics.rsi <= 55) {
+        shortScore += 10;
+      } else if ((analytics.rsi >= 20 && analytics.rsi < 25) || (analytics.rsi > 55 && analytics.rsi <= 60)) {
+        shortScore += 5;
+      }
+
+      // Volume Ratio (15 баллов)
+      if (analytics.volumeRatio >= 1.40) {
+        shortScore += 15;
+      } else if (analytics.volumeRatio >= 1.10) {
+        shortScore += 8;
+      }
+
+      // Бонусы
+      if (analytics.volumeRatio >= 1.50) {
+        shortScore += 10;
+      }
+
+      // Определяем сигнал
+      let signal = 'HOLD';
+      let confidence = 0;
+      let tpPercent = 0;
+      let slPercent = 0;
+
+      console.log(`📊 ${symbol} Scores: LONG=${longScore}, SHORT=${shortScore}`);
+
+      if (longScore >= 50) {
+        signal = 'BUY';
+        confidence = longScore;
+        tpPercent = 0.25;
+        slPercent = -0.13;
+      } else if (shortScore >= 60) {
+        signal = 'SELL';
+        confidence = shortScore;
+        tpPercent = -0.25;
+        slPercent = 0.15;
+      } else {
+        confidence = Math.max(longScore, shortScore);
+      }
+
+      console.log(`🎯 ${symbol} Signal: ${signal}, Confidence: ${confidence}%`);
+
+      // Рассчитываем уровни входа, TP, SL
+      const entryPrice = spotPrice;
+      const tpPrice = entryPrice * (1 + tpPercent / 100);
+      const slPrice = entryPrice * (1 + slPercent / 100);
+      const riskReward = Math.abs(tpPercent / slPercent);
+
+      // Обновляем UI
+      const badgeEl = document.getElementById(`signal-badge-${symbol}`);
+      const confidenceValueEl = document.getElementById(`confidence-value-${symbol}`);
+      const confidenceFillEl = document.getElementById(`confidence-fill-${symbol}`);
+      const entryEl = document.getElementById(`entry-${symbol}`);
+      const tpEl = document.getElementById(`tp-${symbol}`);
+      const slEl = document.getElementById(`sl-${symbol}`);
+      const rrEl = document.getElementById(`rr-${symbol}`);
+
+      if (badgeEl) {
+        badgeEl.textContent = signal;
+        badgeEl.className = `signal-badge ${signal.toLowerCase()}`;
+      }
+
+      if (confidenceValueEl) {
+        confidenceValueEl.textContent = `${confidence}%`;
+      }
+
+      if (confidenceFillEl) {
+        confidenceFillEl.style.width = `${confidence}%`;
+        if (confidence >= 70) {
+          confidenceFillEl.className = 'confidence-fill high';
+        } else if (confidence >= 40) {
+          confidenceFillEl.className = 'confidence-fill medium';
+        } else {
+          confidenceFillEl.className = 'confidence-fill low';
+        }
+      }
+
+      if (entryEl) {
+        entryEl.textContent = `$${entryPrice.toFixed(4)}`;
+      }
+
+      if (tpEl && signal !== 'HOLD') {
+        tpEl.textContent = `$${tpPrice.toFixed(4)} (${tpPercent > 0 ? '+' : ''}${tpPercent.toFixed(2)}%)`;
+      }
+
+      if (slEl && signal !== 'HOLD') {
+        slEl.textContent = `$${slPrice.toFixed(4)} (${slPercent > 0 ? '+' : ''}${slPercent.toFixed(2)}%)`;
+      }
+
+      if (rrEl && signal !== 'HOLD') {
+        rrEl.textContent = `1:${riskReward.toFixed(1)}`;
+      }
+    }
+
     ws.onopen = () => {
       console.log('✅ Подключено к серверу');
     };
@@ -789,6 +1206,11 @@
         // Обновляем аналитику
         if (data[symbol].analytics || data[symbol].orderBook) {
           updateAnalyticsCard(symbol, data[symbol]);
+        }
+
+        // Обновляем торговые сигналы
+        if (data[symbol].analytics && data[symbol].orderBook) {
+          updateSignalCard(symbol, data[symbol]);
         }
       });
     };
