@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Price Tracker</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .crypto-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      min-width: 400px;
+      transition: transform 0.3s ease;
+    }
+
+    .crypto-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #f7931a 0%, #ffa726 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2d3748;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #718096;
+      margin-top: 2px;
+    }
+
+    .price-display {
+      text-align: center;
+      margin: 30px 0;
+    }
+
+    .price {
+      font-size: 48px;
+      font-weight: 800;
+      color: #2d3748;
+      margin-bottom: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .price.flash-green {
+      animation: flashGreen 0.5s;
+    }
+
+    .price.flash-red {
+      animation: flashRed 0.5s;
+    }
+
+    @keyframes flashGreen {
+      0%, 100% { color: #2d3748; }
+      50% { color: #48bb78; transform: scale(1.05); }
+    }
+
+    @keyframes flashRed {
+      0%, 100% { color: #2d3748; }
+      50% { color: #f56565; transform: scale(1.05); }
+    }
+
+    .change {
+      font-size: 20px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 12px;
+      display: inline-block;
+    }
+
+    .change.positive {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+
+    .change.negative {
+      background: #fed7d7;
+      color: #742a2a;
+    }
+
+    .spread {
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 10px;
+      padding: 8px 16px;
+      border-radius: 12px;
+      background: #e2e8f0;
+      color: #4a5568;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .stats .stat-item:nth-child(5),
+    .stats .stat-item:nth-child(6) {
+      grid-column: 1 / -1;
+      font-size: 12px;
+    }
+
+    .stat-item {
+      background: #f7fafc;
+      padding: 15px;
+      border-radius: 12px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #718096;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #48bb78;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .loading {
+      text-align: center;
+      color: #718096;
+    }
+  </style>
+</head>
+<body>
+  <div class="crypto-card">
+    <div class="header">
+      <div class="icon">₿</div>
+      <div>
+        <div class="title">Bitcoin</div>
+        <div class="subtitle">BTC/USDT Futures</div>
+      </div>
+    </div>
+
+    <div class="price-display">
+      <div class="price" id="price">Загрузка...</div>
+      <div class="change" id="change">--</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-label">Максимум 24ч</div>
+        <div class="stat-value" id="high">--</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Минимум 24ч</div>
+        <div class="stat-value" id="low">--</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Объем 24ч</div>
+        <div class="stat-value" id="volume">--</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Обновлено</div>
+        <div class="stat-value" id="time">--</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Точность</div>
+        <div class="stat-value" id="precision">--</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Raw Data</div>
+        <div class="stat-value" id="raw">--</div>
+      </div>
+    </div>
+
+    <div class="status">
+      <div class="status-dot"></div>
+      <span>Подключено к Binance Futures</span>
+    </div>
+  </div>
+
+  <script>
+    const ws = new WebSocket('ws://localhost:5000');
+    let lastPrice = null;
+
+    const priceEl = document.getElementById('price');
+    const changeEl = document.getElementById('change');
+    const highEl = document.getElementById('high');
+    const lowEl = document.getElementById('low');
+    const volumeEl = document.getElementById('volume');
+    const timeEl = document.getElementById('time');
+    const precisionEl = document.getElementById('precision');
+    const rawEl = document.getElementById('raw');
+
+    ws.onopen = () => {
+      console.log('✅ Подключено к серверу');
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      
+      // Анимация изменения цены
+      if (lastPrice !== null) {
+        priceEl.classList.remove('flash-green', 'flash-red');
+        if (data.price > lastPrice) {
+          priceEl.classList.add('flash-green');
+        } else if (data.price < lastPrice) {
+          priceEl.classList.add('flash-red');
+        }
+      }
+      
+      lastPrice = data.price;
+
+      // Обновление данных
+      priceEl.textContent = `$${data.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      
+      changeEl.textContent = `${data.change24h >= 0 ? '+' : ''}${data.change24h.toFixed(2)}%`;
+      changeEl.className = `change ${data.change24h >= 0 ? 'positive' : 'negative'}`;
+      
+      highEl.textContent = `$${data.high24h.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+      lowEl.textContent = `$${data.low24h.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+      volumeEl.textContent = `${(data.volume24h / 1000).toFixed(1)}K BTC`;
+      timeEl.textContent = new Date().toLocaleTimeString('ru-RU');
+      precisionEl.textContent = data.price.toFixed(8);
+      rawEl.textContent = data.rawData;
+    };
+
+    ws.onerror = (error) => {
+      console.error('❌ Ошибка WebSocket:', error);
+    };
+
+    ws.onclose = () => {
+      console.log('⚠️ Соединение закрыто');
+      priceEl.textContent = 'Переподключение...';
+    };
+  </script>
+</body>
+</html>
+
