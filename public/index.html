@@ -11,6 +11,12 @@
       box-sizing: border-box;
     }
 
+    .container {
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -23,20 +29,19 @@
 
     .crypto-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      max-width: 1400px;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 15px;
       margin: 0 auto;
     }
 
     .crypto-card {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
-      border-radius: 24px;
-      padding: 30px;
+      border-radius: 16px;
+      padding: 15px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       transition: transform 0.3s ease;
-      min-height: 280px;
+      min-height: 220px;
     }
 
     .crypto-card:hover {
@@ -46,18 +51,18 @@
     .header {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 8px;
+      margin-bottom: 12px;
     }
 
     .icon {
-      width: 40px;
-      height: 40px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 14px;
       font-weight: bold;
       color: white;
     }
@@ -70,27 +75,27 @@
     .icon.doge { background: linear-gradient(135deg, #c2a633 0%, #d4c17d 100%); }
 
     .title {
-      font-size: 20px;
+      font-size: 14px;
       font-weight: 700;
       color: #2d3748;
     }
 
     .subtitle {
-      font-size: 12px;
+      font-size: 10px;
       color: #718096;
       margin-top: 2px;
     }
 
     .price-display {
       text-align: center;
-      margin: 20px 0;
+      margin: 15px 0;
     }
 
     .price {
-      font-size: 32px;
+      font-size: 20px;
       font-weight: 800;
       color: #2d3748;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
       transition: all 0.3s ease;
     }
 
@@ -143,8 +148,8 @@
     .stats {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 20px;
+      gap: 6px;
+      margin-top: 12px;
     }
 
     .stats .stat-item:nth-child(5),
@@ -200,16 +205,287 @@
       text-align: center;
       color: #718096;
     }
+
+    /* Стили для секции аналитики */
+    .analytics-section {
+      margin-top: 40px;
+      padding: 0 20px;
+    }
+
+    .analytics-title {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 30px;
+    }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 15px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .analytics-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .analytics-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .analytics-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .analytics-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .analytics-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    .indicator {
+      margin-bottom: 12px;
+      padding: 8px;
+      background: #f7fafc;
+      border-radius: 8px;
+    }
+
+    .indicator-label {
+      font-size: 11px;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 3px;
+    }
+
+    .indicator-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    .indicator-value.positive {
+      color: #48bb78;
+    }
+
+    .indicator-value.negative {
+      color: #f56565;
+    }
+
+    .indicator-value.neutral {
+      color: #718096;
+    }
+
+    .macd-values {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      margin-top: 5px;
+    }
+
+    .macd-item {
+      font-size: 10px;
+      padding: 3px;
+      background: #edf2f7;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    /* Секция аналитики */
+    .analytics-section {
+      margin-top: 40px;
+      padding: 20px;
+      background: #f8fafc;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      clear: both;
+    }
+
+    .analytics-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #2d3748;
+      text-align: center;
+      margin-bottom: 30px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    /* Принудительно 6 колонок для всех экранов */
+    @media (max-width: 1200px) {
+      .crypto-grid {
+        grid-template-columns: repeat(6, 1fr);
+        gap: 10px;
+      }
+      .analytics-grid {
+        grid-template-columns: repeat(6, 1fr);
+        gap: 10px;
+      }
+    }
+
+    .analytics-card {
+      background: white;
+      border-radius: 10px;
+      padding: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
+      transition: all 0.3s ease;
+    }
+
+    .analytics-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .analytics-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .analytics-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .analytics-icon.btc { background: linear-gradient(135deg, #f7931a 0%, #ffa726 100%); }
+    .analytics-icon.eth { background: linear-gradient(135deg, #627eea 0%, #8c9eff 100%); }
+    .analytics-icon.sol { background: linear-gradient(135deg, #9945ff 0%, #14f195 100%); }
+    .analytics-icon.xrp { background: linear-gradient(135deg, #23292f 0%, #4a90e2 100%); }
+    .analytics-icon.bnb { background: linear-gradient(135deg, #f3ba2f 0%, #f7d794 100%); }
+    .analytics-icon.doge { background: linear-gradient(135deg, #c2a633 0%, #d4c17d 100%); }
+
+    .analytics-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    .indicator {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      padding: 6px 10px;
+      background: #f8fafc;
+      border-radius: 6px;
+      border-left: 3px solid #e2e8f0;
+      transition: all 0.2s ease;
+    }
+
+    .indicator:hover {
+      background: #f1f5f9;
+      border-left-color: #4299e1;
+    }
+
+    .indicator.liquidity {
+      min-width: 200px;
+      flex-wrap: wrap;
+    }
+    
+    .indicator.liquidity .indicator-value {
+      font-size: 11px;
+      min-width: 120px;
+      text-align: right;
+    }
+
+    .indicator-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .indicator-value {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 6px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .indicator-value.positive {
+      color: #38a169;
+      background: #f0fff4;
+      border: 1px solid #c6f6d5;
+    }
+
+    .indicator-value.negative {
+      color: #e53e3e;
+      background: #fff5f5;
+      border: 1px solid #fed7d7;
+    }
+
+    .indicator-value.neutral {
+      color: #718096;
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+    }
   </style>
 </head>
 <body>
-  <div class="crypto-grid" id="cryptoGrid">
-    <!-- Криптовалюты будут добавлены через JavaScript -->
+  <div class="container">
+    <div class="crypto-grid" id="cryptoGrid">
+      <!-- Криптовалюты будут добавлены через JavaScript -->
+    </div>
+
+    <!-- Секция аналитики -->
+    <div class="analytics-section">
+        <h2 class="analytics-title">📊 Техническая аналитика (15m)</h2>
+      <div class="analytics-grid" id="analyticsGrid">
+        <!-- Аналитика будет добавлена через JavaScript -->
+      </div>
+    </div>
   </div>
 
   <script>
     const ws = new WebSocket('ws://localhost:5000');
     const cryptoGrid = document.getElementById('cryptoGrid');
+    const analyticsGrid = document.getElementById('analyticsGrid');
     const lastPrices = {};
     
     // Конфигурация криптовалют
@@ -227,6 +503,10 @@
       const config = cryptoConfig[symbol];
       const card = createCryptoCard(symbol, config);
       cryptoGrid.appendChild(card);
+      
+      // Создаем аналитическую карточку
+      const analyticsCard = createAnalyticsCard(symbol, config);
+      analyticsGrid.appendChild(analyticsCard);
     });
 
     function createCryptoCard(symbol, config) {
@@ -284,6 +564,75 @@
       return card;
     }
 
+    function createAnalyticsCard(symbol, config) {
+      const card = document.createElement('div');
+      card.className = 'analytics-card';
+      card.id = `analytics-${symbol}`;
+      
+      card.innerHTML = `
+        <div class="analytics-header">
+          <div class="analytics-icon ${config.class}">${config.symbol}</div>
+          <div class="analytics-name">${config.name}</div>
+        </div>
+        
+        <div class="indicator">
+          <div class="indicator-label">EMA 9</div>
+          <div class="indicator-value" id="ema9-${symbol}">--</div>
+        </div>
+        
+        <div class="indicator">
+          <div class="indicator-label">EMA 21</div>
+          <div class="indicator-value" id="ema21-${symbol}">--</div>
+        </div>
+        
+        <div class="indicator">
+          <div class="indicator-label">EMA 50</div>
+          <div class="indicator-value" id="ema50-${symbol}">--</div>
+        </div>
+        
+        <div class="indicator">
+          <div class="indicator-label">RSI (14)</div>
+          <div class="indicator-value" id="rsi-${symbol}">--</div>
+        </div>
+        
+        <div class="indicator">
+          <div class="indicator-label">MACD</div>
+          <div class="indicator-value" id="macd-${symbol}">--</div>
+          <div class="macd-values" id="macd-details-${symbol}">
+            <div class="macd-item">Signal: --</div>
+            <div class="macd-item">Hist: --</div>
+          </div>
+        </div>
+        
+        <div class="indicator">
+          <div class="indicator-label">ATR (14)</div>
+          <div class="indicator-value" id="atr-${symbol}">--</div>
+        </div>
+        
+        <div class="indicator">
+          <div class="indicator-label">Volume Ratio</div>
+          <div class="indicator-value" id="volume-ratio-${symbol}">--</div>
+        </div>
+        
+        <div class="indicator">
+          <div class="indicator-label">Spread</div>
+          <div class="indicator-value" id="spread-${symbol}">--</div>
+        </div>
+        
+        <div class="indicator liquidity">
+          <div class="indicator-label">Liquidity (±0.10%)</div>
+          <div class="indicator-value" id="liquidity-${symbol}">--</div>
+        </div>
+        
+        <div class="indicator">
+          <div class="indicator-label">Bid/Ask Ratio</div>
+          <div class="indicator-value" id="bid-ask-ratio-${symbol}">--</div>
+        </div>
+      `;
+      
+      return card;
+    }
+
     function updateCryptoCard(symbol, data) {
       const priceEl = document.getElementById(`price-${symbol}`);
       const changeEl = document.getElementById(`change-${symbol}`);
@@ -320,6 +669,112 @@
       rawEl.textContent = data.futures.rawData;
     }
 
+    function updateAnalyticsCard(symbol, data) {
+      if (!data) return;
+
+      // Отладочная информация
+      console.log(`🔍 Updating analytics for ${symbol} (${data.timeframe || '15m'}):`, data);
+
+      // Технические индикаторы
+      if (data.analytics) {
+        const analytics = data.analytics;
+        
+        // EMA индикаторы
+        updateIndicator(`ema9-${symbol}`, analytics.ema9, 'price');
+        updateIndicator(`ema21-${symbol}`, analytics.ema21, 'price');
+        updateIndicator(`ema50-${symbol}`, analytics.ema50, 'price');
+        
+        // RSI
+        updateIndicator(`rsi-${symbol}`, analytics.rsi, 'rsi');
+        
+        // MACD
+        if (analytics.macd) {
+          updateIndicator(`macd-${symbol}`, analytics.macd.macd, 'price');
+          
+          const macdDetails = document.getElementById(`macd-details-${symbol}`);
+          if (macdDetails) {
+            macdDetails.innerHTML = `
+              <div class="macd-item">Signal: ${analytics.macd.signal ? analytics.macd.signal.toFixed(4) : '--'}</div>
+              <div class="macd-item">Hist: ${analytics.macd.histogram ? analytics.macd.histogram.toFixed(4) : '--'}</div>
+            `;
+          }
+        }
+        
+        // ATR
+        updateIndicator(`atr-${symbol}`, analytics.atr, 'atr');
+        
+        // Volume Ratio
+        updateIndicator(`volume-ratio-${symbol}`, analytics.volumeRatio, 'ratio');
+      }
+      
+      // Данные стакана заявок
+      if (data.orderBook) {
+        updateIndicator(`spread-${symbol}`, data.orderBook.spreadPercent, 'spread');
+        updateIndicator(`liquidity-${symbol}`, data.orderBook.totalLiquidity, 'liquidity');
+        updateIndicator(`bid-ask-ratio-${symbol}`, data.orderBook.bidAskRatio, 'bid-ask-ratio');
+      }
+    }
+
+    function updateIndicator(elementId, value, type) {
+      const element = document.getElementById(elementId);
+      if (!element || value === null || value === undefined) return;
+
+      let formattedValue = '--';
+      let cssClass = 'neutral';
+
+      switch (type) {
+        case 'price':
+          formattedValue = `$${value.toFixed(2)}`;
+          break;
+        case 'rsi':
+          formattedValue = value.toFixed(2);
+          if (value > 70) cssClass = 'negative'; // Перекупленность
+          else if (value < 30) cssClass = 'positive'; // Перепроданность
+          else cssClass = 'neutral';
+          break;
+        case 'ratio':
+          formattedValue = value.toFixed(2) + 'x';
+          if (value > 1.2) cssClass = 'positive'; // Высокий объем
+          else if (value < 0.8) cssClass = 'negative'; // Низкий объем
+          else cssClass = 'neutral';
+          break;
+        case 'spread':
+          formattedValue = value.toFixed(4) + '%';
+          cssClass = value < 0.1 ? 'positive' : (value < 0.5 ? 'neutral' : 'negative');
+          break;
+        case 'liquidity':
+          // Форматируем большие числа с разделителями тысяч и символом $
+          if (value >= 1000000) {
+            formattedValue = '$' + (value / 1000000).toFixed(1) + 'M';
+          } else if (value >= 1000) {
+            formattedValue = '$' + (value / 1000).toFixed(1) + 'K';
+          } else {
+            formattedValue = '$' + value.toFixed(0);
+          }
+          cssClass = 'neutral';
+          break;
+        case 'atr':
+          // Специальная обработка для ATR с большей точностью
+          formattedValue = value.toFixed(5);
+          cssClass = 'neutral';
+          break;
+        case 'bid-ask-ratio': // Special case for Bid/Ask Ratio
+          formattedValue = value.toFixed(2) + 'x';
+          // Красный цвет для экстремальных значений (< 0.8 или > 2.0)
+          if (value < 0.8 || value > 2.0) {
+            cssClass = 'negative';
+          } else {
+            cssClass = 'neutral';
+          }
+          break;
+        default:
+          formattedValue = value.toFixed(4);
+      }
+
+      element.textContent = formattedValue;
+      element.className = `indicator-value ${cssClass}`;
+    }
+
     ws.onopen = () => {
       console.log('✅ Подключено к серверу');
     };
@@ -330,6 +785,11 @@
       // Обновляем каждую криптовалюту
       Object.keys(data).forEach(symbol => {
         updateCryptoCard(symbol, data[symbol]);
+        
+        // Обновляем аналитику
+        if (data[symbol].analytics || data[symbol].orderBook) {
+          updateAnalyticsCard(symbol, data[symbol]);
+        }
       });
     };
 
