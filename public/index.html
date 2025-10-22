@@ -734,9 +734,9 @@
     }
 
     .deal-action {
-      padding: 8px 20px;
-      border-radius: 20px;
-      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 15px;
+      font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
     }
@@ -778,25 +778,42 @@
 
     .deal-confidence {
       margin-bottom: 15px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .confidence-left {
+      flex: 1;
     }
 
     .confidence-label {
       font-size: 12px;
       color: #718096;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
     }
 
     .confidence-bar {
       width: 100%;
-      height: 8px;
+      height: 12px;
       background: #e2e8f0;
-      border-radius: 4px;
+      border-radius: 6px;
       overflow: hidden;
+    }
+
+    .confidence-percent {
+      font-size: 18px;
+      font-weight: 800;
+      color: #2d3748;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 50px;
     }
 
     .confidence-fill {
       height: 100%;
-      border-radius: 4px;
+      border-radius: 6px;
       transition: width 0.3s ease;
     }
     
@@ -813,10 +830,10 @@
     }
 
     .confidence-percent {
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 18px;
+      font-weight: 800;
       color: #2d3748;
-      margin-top: 5px;
+      white-space: nowrap;
     }
 
     .deal-metrics {
@@ -2529,7 +2546,7 @@
       card.innerHTML = `
         <div class="deal-header">
           <div class="deal-symbol">${config.symbol} ${config.name}</div>
-          <div class="deal-action ${dealData.direction}">${dealData.direction === 'buy' ? 'BUY' : 'SELL'}</div>
+          <div class="deal-action ${dealData.direction}">${dealData.direction === 'buy' ? 'ЛОНГ' : 'ШОРТ'}</div>
           <div class="deal-match-count" style="color: ${matchColor}; font-weight: 600;">${matchedCount}/${totalActive}</div>
         </div>
         
@@ -2538,9 +2555,11 @@
         </div>
 
         <div class="deal-confidence">
-          <div class="confidence-label">Уверенность</div>
-          <div class="confidence-bar">
-            <div class="confidence-fill ${dealData.confidence >= 70 ? 'high' : dealData.confidence >= 40 ? 'medium' : 'low'}" style="width: ${dealData.confidence}%"></div>
+          <div class="confidence-left">
+            <div class="confidence-label">Уверенность</div>
+            <div class="confidence-bar">
+              <div class="confidence-fill ${dealData.confidence >= 70 ? 'high' : dealData.confidence >= 40 ? 'medium' : 'low'}" style="width: ${dealData.confidence}%"></div>
+            </div>
           </div>
           <div class="confidence-percent">${dealData.confidence}%</div>
         </div>
@@ -3451,10 +3470,14 @@
             
             // Обновляем шкалу уверенности с правильным цветом
             const confidenceFillEl = document.querySelector(`#timer-${symbol}`).parentElement.querySelector('.confidence-fill');
+            const confidencePercentEl = document.querySelector(`#timer-${symbol}`).parentElement.querySelector('.confidence-percent');
             if (confidenceFillEl) {
               const confidence = deal.confidence;
               confidenceFillEl.className = `confidence-fill ${confidence >= 70 ? 'high' : confidence >= 40 ? 'medium' : 'low'}`;
               confidenceFillEl.style.width = `${confidence}%`;
+            }
+            if (confidencePercentEl) {
+              confidencePercentEl.textContent = `${deal.confidence}%`;
             }
           }
           
