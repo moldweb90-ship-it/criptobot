@@ -14,6 +14,7 @@
     .container {
       width: 100%;
       margin: 0 auto;
+      margin-top: 15px;
       padding: 20px;
     }
 
@@ -751,27 +752,28 @@
     }
 
     .deal-timer {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      border-radius: 10px;
-      padding: 12px;
+      border-radius: 8px;
+      padding: 8px 12px;
       margin-bottom: 15px;
       text-align: center;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-
-    .timer-label {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.9);
-      margin-bottom: 5px;
-      font-weight: 500;
+    
+    .deal-timer.fast-timer {
+      background: #48bb78;
+    }
+    
+    .deal-timer.standard-timer {
+      background: #667eea;
     }
 
     .timer-value {
-      font-size: 28px;
+      font-size: 16px;
       font-weight: 700;
       color: white;
       font-family: 'Courier New', monospace;
-      letter-spacing: 2px;
     }
 
     .deal-confidence {
@@ -794,9 +796,20 @@
 
     .confidence-fill {
       height: 100%;
-      background: linear-gradient(90deg, #48bb78, #68d391);
       border-radius: 4px;
       transition: width 0.3s ease;
+    }
+    
+    .confidence-fill.high {
+      background: linear-gradient(90deg, #48bb78, #68d391);
+    }
+    
+    .confidence-fill.medium {
+      background: linear-gradient(90deg, #f6ad55, #ed8936);
+    }
+    
+    .confidence-fill.low {
+      background: linear-gradient(90deg, #f56565, #e53e3e);
     }
 
     .confidence-percent {
@@ -892,9 +905,847 @@
 
 
 
+    /* Верхнее меню */
+    .top-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      height: 60px;
+    }
+
+    .menu-section {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #f8fafc;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #2d3748;
+      border: 1px solid #e2e8f0;
+    }
+
+    .menu-label {
+      color: #718096;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .menu-value {
+      color: #2d3748;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .menu-value.positive {
+      color: #48bb78;
+    }
+
+    .menu-value.negative {
+      color: #f56565;
+    }
+
+    .menu-balance {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .menu-balance .menu-label {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .menu-balance .balance-value {
+      color: white;
+      font-size: 16px;
+      font-weight: 800;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .menu-in-deals {
+      background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+      border: none;
+      box-shadow: 0 4px 15px rgba(72, 187, 120, 0.4);
+    }
+
+    .menu-in-deals .menu-label {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .menu-in-deals .deals-value {
+      color: white;
+      font-size: 16px;
+      font-weight: 800;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .menu-pnl {
+      background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+      border: none;
+      box-shadow: 0 4px 15px rgba(66, 153, 225, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .menu-pnl.positive {
+      background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+      box-shadow: 0 4px 15px rgba(72, 187, 120, 0.4);
+    }
+
+    .menu-pnl.negative {
+      background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+      box-shadow: 0 4px 15px rgba(245, 101, 101, 0.4);
+    }
+
+    .menu-pnl .menu-label {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .menu-pnl .pnl-value {
+      color: white;
+      font-size: 16px;
+      font-weight: 800;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    body {
+      padding-top: 70px;
+    }
+
+    /* Выпадающая статистика */
+    .menu-stats-toggle {
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .menu-stats-toggle:hover {
+      transform: translateY(-2px);
+    }
+
+    .stats-dropdown {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      min-width: 320px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      z-index: 1001;
+    }
+
+    .stats-dropdown.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .stats-dropdown-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 10px;
+    }
+
+    .stats-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f7fafc;
+    }
+
+    .stats-item:last-child {
+      border-bottom: none;
+    }
+
+    .stats-item-label {
+      font-size: 13px;
+      color: #718096;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stats-item-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: #2d3748;
+    }
+
+    .stats-item-value.positive {
+      color: #48bb78;
+    }
+
+    .stats-item-value.negative {
+      color: #f56565;
+    }
+
+    .stats-item-value.neutral {
+      color: #4299e1;
+    }
+
+    .stats-toggle-icon {
+      font-size: 12px;
+      transition: transform 0.3s ease;
+    }
+
+    .stats-toggle-icon.open {
+      transform: rotate(180deg);
+    }
+
+    /* Модальное окно истории сделок */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 90%;
+      max-width: 900px;
+      max-height: 85vh;
+      overflow: hidden;
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.show .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 25px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: white;
+    }
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .modal-close {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: white;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: rotate(90deg);
+    }
+
+    .modal-body {
+      padding: 30px;
+      max-height: calc(85vh - 200px);
+      overflow-y: auto;
+    }
+
+    .deals-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 10px;
+    }
+
+    .deals-table th {
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 10px 15px;
+      background: #f7fafc;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .deals-table td {
+      padding: 15px;
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .deals-table tr {
+      transition: all 0.2s ease;
+    }
+
+    .deals-table tbody tr:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .deals-table td:first-child {
+      border-left: 1px solid #e2e8f0;
+      border-radius: 10px 0 0 10px;
+    }
+
+    .deals-table td:last-child {
+      border-right: 1px solid #e2e8f0;
+      border-radius: 0 10px 10px 0;
+    }
+
+    .deal-symbol {
+      font-weight: 700;
+      color: #2d3748;
+      font-size: 14px;
+    }
+
+    .deal-direction {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .deal-direction.long {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+
+    .deal-direction.short {
+      background: #fed7d7;
+      color: #742a2a;
+    }
+
+    .deal-pnl {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .deal-pnl.positive {
+      color: #48bb78;
+    }
+
+    .deal-pnl.negative {
+      color: #f56565;
+    }
+
+    .modal-footer {
+      padding: 20px 30px;
+      background: #f7fafc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .pagination {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .pagination-btn {
+      background: white;
+      border: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: #4a5568;
+      transition: all 0.2s ease;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .pagination-btn.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
+    .pagination-info {
+      font-size: 13px;
+      color: #718096;
+      font-weight: 600;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #a0aec0;
+    }
+
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    .empty-state-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: #718096;
+    }
+
+    /* Улучшенная статистика */
+    .menu-stats-toggle {
+      background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+      border: none;
+      box-shadow: 0 4px 15px rgba(66, 153, 225, 0.4);
+    }
+
+    .menu-stats-toggle .menu-label,
+    .menu-stats-toggle .menu-value {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .menu-stats-toggle .stats-toggle-icon {
+      color: white;
+    }
+
+    .stats-dropdown {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+      border: 2px solid #e2e8f0;
+    }
+
+    .stats-item {
+      transition: all 0.2s ease;
+    }
+
+    .stats-item:hover {
+      background: #f7fafc;
+      border-radius: 8px;
+      padding-left: 10px;
+    }
+
+    /* Toggle переключатель AUTO/MANUAL */
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .toggle-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 24px;
+      background: #e2e8f0;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-switch.active {
+      background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    }
+
+    .toggle-slider {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle-switch.active .toggle-slider {
+      left: 28px;
+    }
+
+    .toggle-status {
+      font-size: 11px;
+      font-weight: 700;
+      min-width: 60px;
+    }
+
+    .toggle-status.manual {
+      color: #718096;
+    }
+
+    .toggle-status.auto {
+      color: #48bb78;
+    }
+
+    /* Таймер до свечи */
+    .timer-item {
+      background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+      border: none;
+      box-shadow: 0 4px 15px rgba(245, 101, 101, 0.4);
+    }
+
+    .timer-item .menu-label,
+    .timer-item .menu-value {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .timer-value {
+      color: white;
+      font-size: 16px;
+      font-weight: 800;
+      font-family: 'Courier New', monospace;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Статистика за сегодня */
+    .today-stats {
+      background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+      border: none;
+      box-shadow: 0 4px 15px rgba(237, 137, 54, 0.4);
+    }
+
+    .today-stats .menu-label {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .today-stats .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .today-stats .stat-mini {
+      text-align: center;
+    }
+
+    .today-stats .stat-mini-label {
+      font-size: 9px;
+      color: rgba(255, 255, 255, 0.8);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .today-stats .stat-mini-value {
+      font-size: 12px;
+      font-weight: 800;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Переключатель темы */
+    .theme-toggle {
+      cursor: pointer;
+      background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(45, 55, 72, 0.4);
+    }
+
+    .theme-toggle:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(45, 55, 72, 0.6);
+    }
+
+    /* Dark theme */
+    body.dark-theme {
+      background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    }
+
+    body.dark-theme .crypto-card,
+    body.dark-theme .analytics-card,
+    body.dark-theme .deal-card,
+    body.dark-theme .open-deals-container,
+    body.dark-theme .deal-prep-container {
+      background: rgba(45, 55, 72, 0.95);
+      color: #e2e8f0;
+    }
+
+    body.dark-theme .title,
+    body.dark-theme .analytics-name,
+    body.dark-theme .deal-symbol,
+    body.dark-theme .stat-value,
+    body.dark-theme .indicator-value {
+      color: #e2e8f0;
+    }
+
+    body.dark-theme .subtitle,
+    body.dark-theme .stat-label,
+    body.dark-theme .indicator-label {
+      color: #a0aec0;
+    }
+
+    body.dark-theme .top-menu {
+      background: rgba(45, 55, 72, 0.98);
+    }
+
+    body.dark-theme .menu-item {
+      background: #2d3748;
+      border-color: #4a5568;
+    }
+
+    body.dark-theme .toggle-container {
+      background: #2d3748;
+      border-color: #4a5568;
+    }
+
+    body.dark-theme .modal-content {
+      background: #2d3748;
+      color: #e2e8f0;
+    }
+
+    body.dark-theme .deals-table th {
+      background: #1a202c;
+      color: #a0aec0;
+    }
+
+    body.dark-theme .deals-table td {
+      background: #2d3748;
+      border-color: #4a5568;
+      color: #e2e8f0;
+    }
+
   </style>
 </head>
 <body>
+  <!-- Верхнее меню -->
+  <div class="top-menu">
+    <div class="menu-section">
+      <div class="menu-item menu-balance">
+        <span style="font-size: 20px;">💰</span>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span class="menu-label">Баланс</span>
+          <span class="menu-value balance-value" id="menu-balance">$1,000.00</span>
+        </div>
+      </div>
+      <div class="menu-item menu-in-deals">
+        <span style="font-size: 20px;">📊</span>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span class="menu-label">В сделках</span>
+          <span class="menu-value deals-value" id="menu-in-deals">$0.00</span>
+        </div>
+      </div>
+      <div class="menu-item menu-pnl">
+        <span style="font-size: 20px;">📈</span>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span class="menu-label">Общий PnL</span>
+          <span class="menu-value pnl-value" id="menu-pnl">+$0.00 (0.00%)</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="menu-section">
+      <!-- Переключатель AUTO/MANUAL -->
+      <div class="toggle-container">
+        <span class="toggle-label">🤖 Режим:</span>
+        <div class="toggle-switch" id="auto-toggle">
+          <div class="toggle-slider"></div>
+        </div>
+        <span class="toggle-status manual" id="toggle-status">MANUAL</span>
+      </div>
+      
+      <!-- Таймер до следующей свечи -->
+      <div class="menu-item timer-item">
+        <span style="font-size: 18px;">⏱️</span>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span class="menu-label">До свечи</span>
+          <span class="timer-value" id="candle-timer">--:--</span>
+        </div>
+      </div>
+      
+      <!-- Статистика за сегодня -->
+      <div class="menu-item today-stats">
+        <div style="display: flex; flex-direction: column; gap: 2px; width: 100%;">
+          <span class="menu-label">📊 Сегодня</span>
+          <div class="stats-grid">
+            <div class="stat-mini">
+              <div class="stat-mini-label">Сделок</div>
+              <div class="stat-mini-value" id="today-deals">0</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-mini-label">WR</div>
+              <div class="stat-mini-value" id="today-wr">0%</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-mini-label">PnL</div>
+              <div class="stat-mini-value" id="today-pnl">$0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="menu-item menu-stats-toggle" id="stats-toggle">
+        <span style="font-size: 18px;">📊</span>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span class="menu-label">Статистика</span>
+          <span class="menu-value" style="font-size: 12px;">
+            <span class="stats-toggle-icon" id="stats-icon">▼</span>
+          </span>
+        </div>
+        
+        <!-- Выпадающее меню -->
+        <div class="stats-dropdown" id="stats-dropdown">
+          <div class="stats-dropdown-title">
+            📊 Статистика торговли
+          </div>
+          
+          <div class="stats-item">
+            <div class="stats-item-label">📋 Всего сделок</div>
+            <div class="stats-item-value neutral" id="stat-total-deals">0</div>
+          </div>
+          
+          <div class="stats-item">
+            <div class="stats-item-label">✅ Прибыльных</div>
+            <div class="stats-item-value positive" id="stat-profitable">0 (0%)</div>
+          </div>
+          
+          <div class="stats-item">
+            <div class="stats-item-label">❌ Убыточных</div>
+            <div class="stats-item-value negative" id="stat-losses">0 (0%)</div>
+          </div>
+          
+          <div class="stats-item">
+            <div class="stats-item-label">📈 Средний профит</div>
+            <div class="stats-item-value positive" id="stat-avg-profit">+$0.00</div>
+          </div>
+          
+          <div class="stats-item">
+            <div class="stats-item-label">📉 Средний убыток</div>
+            <div class="stats-item-value negative" id="stat-avg-loss">-$0.00</div>
+          </div>
+          
+          <div class="stats-item">
+            <div class="stats-item-label">⚖️ R/R Ratio</div>
+            <div class="stats-item-value" id="stat-rr-ratio">0.00</div>
+          </div>
+          
+          <div class="stats-item">
+            <div class="stats-item-label">💡 Expectancy</div>
+            <div class="stats-item-value" id="stat-expectancy">+$0.00</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="menu-item" id="history-toggle" style="cursor: pointer; transition: all 0.3s ease;">
+        <span style="font-size: 18px;">📜</span>
+        <span style="font-size: 13px; font-weight: 600; color: #2d3748;">История сделок</span>
+      </div>
+      
+      <div class="menu-item">
+        <div class="status-dot"></div>
+        <span id="menu-status">Подключено</span>
+      </div>
+      
+      <!-- Переключатель темы -->
+      <div class="theme-toggle" id="theme-toggle" title="Сменить тему">
+        <span id="theme-icon">🌙</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно истории сделок -->
+  <div class="modal-overlay" id="history-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>📜</span>
+          <span>История сделок</span>
+        </div>
+        <button class="modal-close" id="modal-close">✕</button>
+      </div>
+      
+      <div class="modal-body" id="modal-body">
+        <!-- Содержимое будет добавлено через JavaScript -->
+      </div>
+      
+      <div class="modal-footer">
+        <div class="pagination-info" id="pagination-info">Показано 0-0 из 0</div>
+        <div class="pagination" id="pagination">
+          <!-- Кнопки будут добавлены через JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="container">
     <!-- Секция сделок -->
     <div class="deals-section">
@@ -905,7 +1756,7 @@
           <!-- Открытые сделки будут добавлены через JavaScript -->
         </div>
       </div>
-
+      
       <!-- Подготовка сделки (справа) -->
       <div class="deal-prep-container">
         <h2 class="deal-prep-title">🎯 Подготовка сделки</h2>
@@ -938,7 +1789,261 @@
     const analyticsGrid = document.getElementById('analyticsGrid');
     const dealPrepGrid = document.getElementById('dealPrepGrid');
     const lastPrices = {};
-    const dealPrepData = {}; // Хранилище данных для подготовки сделок
+    let dealPrepData = {}; // Хранилище данных для подготовки сделок
+    
+    // Загружаем сохраненные данные при загрузке страницы
+    function loadDealPrepData() {
+      const saved = localStorage.getItem('dealPrepData');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          // Восстанавливаем только активные таймеры (не истекшие)
+          const now = Date.now();
+          Object.keys(parsed).forEach(symbol => {
+            const deal = parsed[symbol];
+            if (deal && deal.timestamp) {
+              const elapsed = Math.floor((now - deal.timestamp) / 1000);
+              const remaining = deal.timerSeconds - elapsed;
+              if (remaining > 0) {
+                dealPrepData[symbol] = {
+                  ...deal,
+                  timerSeconds: remaining
+                };
+                // Восстанавливаем карточку
+                createOrUpdateDealCard(symbol, dealPrepData[symbol]);
+                
+                // Класс таймера устанавливается при создании карточки и не меняется
+              }
+            }
+          });
+        } catch (e) {
+          console.log('Ошибка загрузки данных сделок:', e);
+        }
+      }
+    }
+    
+    // Сохраняем данные в localStorage
+    function saveDealPrepData() {
+      try {
+        localStorage.setItem('dealPrepData', JSON.stringify(dealPrepData));
+      } catch (e) {
+        console.log('Ошибка сохранения данных сделок:', e);
+      }
+    }
+    
+    // ============================================
+    // Система учета сделок и баланса
+    // ============================================
+    let initialBalance = 1000; // Начальный баланс
+    let currentBalance = 1000; // Текущий баланс (с учетом открытых позиций)
+    let realizedPnL = 0; // Прибыль/убыток от закрытых сделок
+    let openPositions = []; // Массив открытых позиций
+    let closedDeals = []; // История закрытых сделок
+    let isAutoTradingEnabled = false; // Режим автоторговли
+    let isDarkTheme = false; // Тема интерфейса
+    
+    // Расчет нереализованного PnL (открытые позиции)
+    function calculateUnrealizedPnL() {
+      return openPositions.reduce((total, position) => {
+        const priceDiff = position.direction === 'LONG' 
+          ? (position.currentPrice - position.entryPrice)
+          : (position.entryPrice - position.currentPrice);
+        
+        return total + (priceDiff * position.volume);
+      }, 0);
+    }
+    
+    // Расчет общего PnL
+    function calculateTotalPnL() {
+      const unrealizedPnL = calculateUnrealizedPnL();
+      const totalPnL = realizedPnL + unrealizedPnL;
+      const roi = (totalPnL / initialBalance) * 100;
+      
+      return { 
+        totalPnL, 
+        roi, 
+        realizedPnL, 
+        unrealizedPnL 
+      };
+    }
+    
+    // Расчет суммы в открытых сделках
+    function calculateInDeals() {
+      return openPositions.reduce((sum, pos) => sum + pos.amountUSD, 0);
+    }
+    
+    // Обновление отображения баланса и PnL
+    function updateBalanceDisplay() {
+      const pnl = calculateTotalPnL();
+      const inDeals = calculateInDeals();
+      
+      // Обновляем баланс
+      document.getElementById('menu-balance').textContent = 
+        `$${currentBalance.toFixed(2)}`;
+      
+      // Обновляем сумму в сделках
+      document.getElementById('menu-in-deals').textContent = 
+        `$${inDeals.toFixed(2)}`;
+      
+      // Обновляем PnL
+      const sign = pnl.totalPnL >= 0 ? '+' : '';
+      const pnlElement = document.getElementById('menu-pnl');
+      const pnlContainer = pnlElement.closest('.menu-pnl');
+      
+      pnlElement.textContent = 
+        `${sign}$${pnl.totalPnL.toFixed(2)} (${sign}${pnl.roi.toFixed(2)}%)`;
+      
+      // Обновляем цвет в зависимости от PnL
+      pnlContainer.classList.remove('positive', 'negative');
+      if (pnl.totalPnL > 0) {
+        pnlContainer.classList.add('positive');
+      } else if (pnl.totalPnL < 0) {
+        pnlContainer.classList.add('negative');
+      }
+      
+      // Обновляем статистику торговли
+      updateTradingStats();
+      
+      // Обновляем статистику за сегодня
+      updateTodayStats();
+    }
+    
+    // Обновление статистики торговли
+    function updateTradingStats() {
+      const totalDeals = closedDeals.length;
+      const profitableDeals = closedDeals.filter(d => d.realizedPnL > 0);
+      const losingDeals = closedDeals.filter(d => d.realizedPnL < 0);
+      
+      const winRate = totalDeals > 0 ? (profitableDeals.length / totalDeals * 100) : 0;
+      const lossRate = totalDeals > 0 ? (losingDeals.length / totalDeals * 100) : 0;
+      
+      const avgProfit = profitableDeals.length > 0
+        ? profitableDeals.reduce((sum, d) => sum + d.realizedPnL, 0) / profitableDeals.length
+        : 0;
+      
+      const avgLoss = losingDeals.length > 0
+        ? losingDeals.reduce((sum, d) => sum + d.realizedPnL, 0) / losingDeals.length
+        : 0;
+      
+      const rrRatio = avgLoss !== 0 ? Math.abs(avgProfit / avgLoss) : 0;
+      const expectancy = totalDeals > 0 ? realizedPnL / totalDeals : 0;
+      
+      // Обновляем UI
+      document.getElementById('stat-total-deals').textContent = totalDeals;
+      
+      document.getElementById('stat-profitable').textContent = 
+        `${profitableDeals.length} (${winRate.toFixed(0)}%)`;
+      
+      document.getElementById('stat-losses').textContent = 
+        `${losingDeals.length} (${lossRate.toFixed(0)}%)`;
+      
+      document.getElementById('stat-avg-profit').textContent = 
+        `+$${avgProfit.toFixed(2)}`;
+      
+      document.getElementById('stat-avg-loss').textContent = 
+        `${avgLoss.toFixed(2) === '0.00' ? '-$0.00' : '$' + avgLoss.toFixed(2)}`;
+      
+      const rrElement = document.getElementById('stat-rr-ratio');
+      rrElement.textContent = rrRatio.toFixed(2);
+      rrElement.className = 'stats-item-value';
+      if (rrRatio >= 2) {
+        rrElement.classList.add('positive');
+      } else if (rrRatio >= 1) {
+        rrElement.classList.add('neutral');
+      } else {
+        rrElement.classList.add('negative');
+      }
+      
+      const expElement = document.getElementById('stat-expectancy');
+      const expSign = expectancy >= 0 ? '+' : '';
+      expElement.textContent = `${expSign}$${expectancy.toFixed(2)}`;
+      expElement.className = 'stats-item-value';
+      if (expectancy > 0) {
+        expElement.classList.add('positive');
+      } else if (expectancy < 0) {
+        expElement.classList.add('negative');
+      } else {
+        expElement.classList.add('neutral');
+      }
+    }
+    
+    // Открытие позиции
+    function openPosition(symbol, direction, entryPrice, volume) {
+      const position = {
+        id: Date.now(), // Уникальный ID
+        symbol: symbol,
+        direction: direction, // 'LONG' или 'SHORT'
+        entryPrice: entryPrice,
+        volume: volume,
+        amountUSD: entryPrice * volume,
+        openTime: Date.now(),
+        currentPrice: entryPrice,
+        unrealizedPnL: 0
+      };
+      
+      openPositions.push(position);
+      currentBalance -= position.amountUSD; // Вычитаем из баланса
+      
+      console.log(`📈 Открыта позиция: ${direction} ${symbol} @ $${entryPrice.toFixed(2)}, Volume: ${volume}`);
+      
+      updateBalanceDisplay();
+      return position;
+    }
+    
+    // Закрытие позиции
+    function closePosition(positionIndex, exitPrice) {
+      const position = openPositions[positionIndex];
+      
+      if (!position) {
+        console.error('❌ Позиция не найдена');
+        return null;
+      }
+      
+      const priceDiff = position.direction === 'LONG'
+        ? (exitPrice - position.entryPrice)
+        : (position.entryPrice - exitPrice);
+      
+      const profit = priceDiff * position.volume;
+      
+      // Обновляем балансы
+      realizedPnL += profit;
+      currentBalance += position.amountUSD + profit;
+      
+      // Создаем запись о закрытой сделке
+      const closedDeal = {
+        ...position,
+        exitPrice: exitPrice,
+        closeTime: Date.now(),
+        duration: Date.now() - position.openTime,
+        realizedPnL: profit,
+        profitPercent: (profit / position.amountUSD) * 100
+      };
+      
+      closedDeals.push(closedDeal);
+      openPositions.splice(positionIndex, 1);
+      
+      console.log(`📉 Закрыта позиция: ${position.direction} ${position.symbol} @ $${exitPrice.toFixed(2)}, PnL: ${profit >= 0 ? '+' : ''}$${profit.toFixed(2)}`);
+      
+      updateBalanceDisplay();
+      return closedDeal;
+    }
+    
+    // Обновление текущих цен в открытых позициях
+    function updateOpenPositionsPrices(data) {
+      openPositions.forEach(position => {
+        if (data[position.symbol] && data[position.symbol].futures) {
+          position.currentPrice = data[position.symbol].futures.price;
+          
+          // Пересчитываем unrealized PnL
+          const priceDiff = position.direction === 'LONG' 
+            ? (position.currentPrice - position.entryPrice)
+            : (position.entryPrice - position.currentPrice);
+          
+          position.unrealizedPnL = priceDiff * position.volume;
+        }
+      });
+    }
+    // ============================================
     
     // Конфигурация криптовалют
     const cryptoConfig = {
@@ -1041,7 +2146,7 @@
         <div class="indicator">
           <div class="indicator-label-container">
             <div class="dot neutral" id="dot1-${symbol}"></div>
-            <div class="indicator-label">EMA 9</div>
+          <div class="indicator-label">EMA 9</div>
           </div>
           <div class="indicator-value" id="ema9-${symbol}">--</div>
         </div>
@@ -1049,7 +2154,7 @@
         <div class="indicator">
           <div class="indicator-label-container">
             <div class="dot neutral" id="dot2-${symbol}"></div>
-            <div class="indicator-label">EMA 21</div>
+          <div class="indicator-label">EMA 21</div>
           </div>
           <div class="indicator-value" id="ema21-${symbol}">--</div>
         </div>
@@ -1057,7 +2162,7 @@
         <div class="indicator">
           <div class="indicator-label-container">
             <div class="dot neutral" id="dot3-${symbol}"></div>
-            <div class="indicator-label">EMA 50</div>
+          <div class="indicator-label">EMA 50</div>
           </div>
           <div class="indicator-value" id="ema50-${symbol}">--</div>
         </div>
@@ -1065,7 +2170,7 @@
         <div class="indicator">
           <div class="indicator-label-container">
             <div class="dot neutral" id="rsi-dot-${symbol}"></div>
-            <div class="indicator-label">RSI (14)</div>
+          <div class="indicator-label">RSI (14)</div>
           </div>
           <div class="indicator-value" id="rsi-${symbol}">--</div>
         </div>
@@ -1073,7 +2178,7 @@
         <div class="indicator">
           <div class="indicator-label-container">
             <div class="dot neutral" id="macd-dot-${symbol}"></div>
-            <div class="indicator-label">MACD</div>
+          <div class="indicator-label">MACD</div>
           </div>
           <div class="indicator-value" id="macd-${symbol}">--</div>
           <div class="macd-values" id="macd-details-${symbol}">
@@ -1085,7 +2190,7 @@
         <div class="indicator">
           <div class="indicator-label-container">
             <div class="dot neutral" id="atr-dot-${symbol}"></div>
-            <div class="indicator-label">ATR (14)</div>
+          <div class="indicator-label">ATR (14)</div>
           </div>
           <div class="indicator-value" id="atr-${symbol}">--</div>
         </div>
@@ -1093,7 +2198,7 @@
         <div class="indicator">
           <div class="indicator-label-container">
             <div class="dot neutral" id="volume-dot-${symbol}"></div>
-            <div class="indicator-label">Volume Ratio</div>
+          <div class="indicator-label">Volume Ratio</div>
           </div>
           <div class="indicator-value" id="volume-ratio-${symbol}">--</div>
         </div>
@@ -1101,7 +2206,7 @@
         <div class="indicator">
           <div class="indicator-label-container">
             <div class="dot neutral" id="spread-dot-${symbol}"></div>
-            <div class="indicator-label">Spread</div>
+          <div class="indicator-label">Spread</div>
           </div>
           <div class="indicator-value" id="spread-${symbol}">--</div>
         </div>
@@ -1109,7 +2214,7 @@
         <div class="indicator liquidity">
           <div class="indicator-label-container">
             <div class="dot neutral" id="liquidity-dot-${symbol}"></div>
-            <div class="indicator-label">Liquidity (±0.10%)</div>
+          <div class="indicator-label">Liquidity (±0.10%)</div>
           </div>
           <div class="indicator-value" id="liquidity-${symbol}">--</div>
         </div>
@@ -1117,7 +2222,7 @@
         <div class="indicator">
           <div class="indicator-label-container">
             <div class="dot neutral" id="bid-ask-dot-${symbol}"></div>
-            <div class="indicator-label">Bid/Ask Ratio</div>
+          <div class="indicator-label">Bid/Ask Ratio</div>
           </div>
           <div class="indicator-value" id="bid-ask-ratio-${symbol}">--</div>
         </div>
@@ -1326,21 +2431,40 @@
       if (dealDirection) {
         // Если это новая сделка, инициализируем таймер
         if (!dealPrepData[symbol]) {
+          // Определяем время таймера на основе уверенности
+          const timerSeconds = confidence >= 65 ? 60 : 120; // 1 минута для высоких сигналов, 2 минуты для слабых
+          
           dealPrepData[symbol] = {
             direction: dealDirection,
             confidence: confidence,
             price: currentPrice,
             timestamp: Date.now(),
-            timerSeconds: 120, // 2 минуты = 120 секунд
+            timerSeconds: timerSeconds,
             matchedIndicators: matchedIndicators,
             totalActiveIndicators: totalActiveIndicators
           };
+          
+          // Сохраняем в localStorage
+          saveDealPrepData();
         } else {
           // Обновляем уверенность, цену и совпадения
+          const oldConfidence = dealPrepData[symbol].confidence;
           dealPrepData[symbol].confidence = confidence;
           dealPrepData[symbol].price = currentPrice;
           dealPrepData[symbol].matchedIndicators = matchedIndicators;
           dealPrepData[symbol].totalActiveIndicators = totalActiveIndicators;
+          
+          // Если уверенность изменилась с низкой на высокую, обновляем таймер
+          if (oldConfidence < 65 && confidence >= 65) {
+            dealPrepData[symbol].timerSeconds = 60; // Переключаем на 1 минуту
+            dealPrepData[symbol].timestamp = Date.now(); // Обновляем время начала
+          } else if (oldConfidence >= 65 && confidence < 65) {
+            dealPrepData[symbol].timerSeconds = 120; // Переключаем на 2 минуты
+            dealPrepData[symbol].timestamp = Date.now(); // Обновляем время начала
+          }
+          
+          // Сохраняем изменения
+          saveDealPrepData();
         }
         
         // Создаем или обновляем карточку
@@ -1353,6 +2477,8 @@
           if (currentConfidence < 50) {
             removeDealCard(symbol);
             delete dealPrepData[symbol];
+            // Сохраняем изменения
+            saveDealPrepData();
           }
         }
       }
@@ -1385,7 +2511,7 @@
       const slPercent = dealData.direction === 'buy' ? '-0.13%' : '+0.13%';
       
       // Инициализируем таймер для отображения
-      const timerSeconds = dealData.timerSeconds || 120;
+      const timerSeconds = dealData.timerSeconds || (dealData.confidence >= 65 ? 60 : 120);
       const minutes = Math.floor(timerSeconds / 60);
       const seconds = timerSeconds % 60;
       const timerDisplay = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
@@ -1407,15 +2533,14 @@
           <div class="deal-match-count" style="color: ${matchColor}; font-weight: 600;">${matchedCount}/${totalActive}</div>
         </div>
         
-        <div class="deal-timer" id="timer-${symbol}">
-          <div class="timer-label">⏱️ Подтверждение</div>
+        <div class="deal-timer ${dealData.confidence >= 65 ? 'fast-timer' : 'standard-timer'}" id="timer-${symbol}">
           <div class="timer-value" id="timer-value-${symbol}">${timerDisplay}</div>
         </div>
 
         <div class="deal-confidence">
           <div class="confidence-label">Уверенность</div>
           <div class="confidence-bar">
-            <div class="confidence-fill" style="width: ${dealData.confidence}%"></div>
+            <div class="confidence-fill ${dealData.confidence >= 70 ? 'high' : dealData.confidence >= 40 ? 'medium' : 'low'}" style="width: ${dealData.confidence}%"></div>
           </div>
           <div class="confidence-percent">${dealData.confidence}%</div>
         </div>
@@ -1795,7 +2920,7 @@
         }
         
         console.log(`Spread ${symbol} dot updated: ${signal} color`);
-      }
+    }
 
     function updateIndicator(elementId, value, type) {
       const element = document.getElementById(elementId);
@@ -2013,6 +3138,299 @@
       }
     }
 
+    // ============================================
+    // История сделок - модальное окно
+    // ============================================
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    const maxPages = 10;
+    
+    function openHistoryModal() {
+      const modal = document.getElementById('history-modal');
+      modal.classList.add('show');
+      currentPage = 1;
+      renderHistoryPage();
+    }
+    
+    function closeHistoryModal() {
+      const modal = document.getElementById('history-modal');
+      modal.classList.remove('show');
+    }
+    
+    function renderHistoryPage() {
+      const modalBody = document.getElementById('modal-body');
+      const paginationInfo = document.getElementById('pagination-info');
+      const pagination = document.getElementById('pagination');
+      
+      // Сортируем сделки (последние первыми)
+      const sortedDeals = [...closedDeals].reverse();
+      
+      // Если нет сделок
+      if (sortedDeals.length === 0) {
+        modalBody.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📊</div>
+            <div class="empty-state-text">История сделок пока пуста</div>
+            <p style="margin-top: 10px; color: #a0aec0; font-size: 14px;">Закрытые сделки будут отображаться здесь</p>
+          </div>
+        `;
+        paginationInfo.textContent = 'Показано 0-0 из 0';
+        pagination.innerHTML = '';
+        return;
+      }
+      
+      // Расчет пагинации
+      const totalPages = Math.min(Math.ceil(sortedDeals.length / itemsPerPage), maxPages);
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = Math.min(startIndex + itemsPerPage, sortedDeals.length, maxPages * itemsPerPage);
+      const pageDeals = sortedDeals.slice(startIndex, endIndex);
+      
+      // Рендерим таблицу
+      modalBody.innerHTML = `
+        <table class="deals-table">
+          <thead>
+            <tr>
+              <th>Монета</th>
+              <th>Направление</th>
+              <th>Вход</th>
+              <th>Выход</th>
+              <th>PnL</th>
+              <th>%</th>
+              <th>Время закрытия</th>
+              <th>Длительность</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${pageDeals.map(deal => {
+              const duration = formatDuration(deal.duration);
+              const closeTime = new Date(deal.closeTime).toLocaleString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+              
+              const pnlClass = deal.realizedPnL >= 0 ? 'positive' : 'negative';
+              const pnlSign = deal.realizedPnL >= 0 ? '+' : '';
+              
+              return `
+                <tr>
+                  <td><div class="deal-symbol">${deal.symbol.replace('USDT', '')}</div></td>
+                  <td><span class="deal-direction ${deal.direction.toLowerCase()}">${deal.direction}</span></td>
+                  <td>$${deal.entryPrice.toFixed(4)}</td>
+                  <td>$${deal.exitPrice.toFixed(4)}</td>
+                  <td><div class="deal-pnl ${pnlClass}">${pnlSign}$${deal.realizedPnL.toFixed(2)}</div></td>
+                  <td><div class="deal-pnl ${pnlClass}">${pnlSign}${deal.profitPercent.toFixed(2)}%</div></td>
+                  <td>${closeTime}</td>
+                  <td>${duration}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      `;
+      
+      // Обновляем информацию о пагинации
+      const displayedTo = Math.min(endIndex, maxPages * itemsPerPage);
+      paginationInfo.textContent = `Показано ${startIndex + 1}-${displayedTo} из ${Math.min(sortedDeals.length, maxPages * itemsPerPage)}`;
+      
+      // Рендерим кнопки пагинации
+      let paginationHTML = `
+        <button class="pagination-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>
+      `;
+      
+      for (let i = 1; i <= totalPages; i++) {
+        paginationHTML += `
+          <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>
+        `;
+      }
+      
+      paginationHTML += `
+        <button class="pagination-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>›</button>
+      `;
+      
+      pagination.innerHTML = paginationHTML;
+    }
+    
+    function goToPage(page) {
+      const totalPages = Math.min(Math.ceil(closedDeals.length / itemsPerPage), maxPages);
+      if (page < 1 || page > totalPages) return;
+      currentPage = page;
+      renderHistoryPage();
+    }
+    
+    function formatDuration(ms) {
+      const seconds = Math.floor(ms / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      
+      if (hours > 0) {
+        return `${hours}ч ${minutes % 60}м`;
+      } else if (minutes > 0) {
+        return `${minutes}м ${seconds % 60}с`;
+      } else {
+        return `${seconds}с`;
+      }
+    }
+    
+    // ============================================
+    // Автоторговля и настройки
+    // ============================================
+    
+    // Переключатель AUTO/MANUAL
+    document.getElementById('auto-toggle').addEventListener('click', function() {
+      isAutoTradingEnabled = !isAutoTradingEnabled;
+      const toggle = this;
+      const status = document.getElementById('toggle-status');
+      
+      if (isAutoTradingEnabled) {
+        toggle.classList.add('active');
+        status.textContent = 'AUTO';
+        status.classList.remove('manual');
+        status.classList.add('auto');
+        console.log('🤖 Автоторговля ВКЛЮЧЕНА');
+      } else {
+        toggle.classList.remove('active');
+        status.textContent = 'MANUAL';
+        status.classList.remove('auto');
+        status.classList.add('manual');
+        console.log('✋ Ручной режим');
+      }
+      
+      // Сохраняем настройку
+      localStorage.setItem('autoTrading', isAutoTradingEnabled);
+    });
+    
+    // Загрузка настройки автоторговли
+    const savedAutoTrading = localStorage.getItem('autoTrading');
+    if (savedAutoTrading === 'true') {
+      document.getElementById('auto-toggle').click();
+    }
+    
+    // ============================================
+    // Таймер до следующей свечи
+    // ============================================
+    function getTimeToNextCandle() {
+      const now = new Date();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+      
+      // Найти следующую отметку: 00, 15, 30, 45
+      let nextMark;
+      if (minutes < 15) {
+        nextMark = 15;
+      } else if (minutes < 30) {
+        nextMark = 30;
+      } else if (minutes < 45) {
+        nextMark = 45;
+      } else {
+        nextMark = 60; // Следующий час
+      }
+      
+      const minutesToNext = nextMark - minutes;
+      const secondsToNext = 60 - seconds;
+      
+      const totalSeconds = (minutesToNext - 1) * 60 + secondsToNext;
+      
+      const mins = Math.floor(totalSeconds / 60);
+      const secs = totalSeconds % 60;
+      
+      return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+    
+    // Обновляем таймер каждую секунду
+    setInterval(() => {
+      document.getElementById('candle-timer').textContent = getTimeToNextCandle();
+    }, 1000);
+    
+    // Инициализируем таймер
+    document.getElementById('candle-timer').textContent = getTimeToNextCandle();
+    
+    // ============================================
+    // Статистика за сегодня
+    // ============================================
+    function updateTodayStats() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const todayDeals = closedDeals.filter(deal => {
+        const dealDate = new Date(deal.closeTime);
+        dealDate.setHours(0, 0, 0, 0);
+        return dealDate.getTime() === today.getTime();
+      });
+      
+      const todayProfitable = todayDeals.filter(d => d.realizedPnL > 0).length;
+      const todayWinRate = todayDeals.length > 0 ? (todayProfitable / todayDeals.length * 100) : 0;
+      const todayPnL = todayDeals.reduce((sum, d) => sum + d.realizedPnL, 0);
+      
+      document.getElementById('today-deals').textContent = todayDeals.length;
+      document.getElementById('today-wr').textContent = `${todayWinRate.toFixed(0)}%`;
+      
+      const pnlEl = document.getElementById('today-pnl');
+      const sign = todayPnL >= 0 ? '+' : '';
+      pnlEl.textContent = `${sign}$${Math.abs(todayPnL).toFixed(0)}`;
+    }
+    
+    // ============================================
+    // Переключатель темы
+    // ============================================
+    document.getElementById('theme-toggle').addEventListener('click', function() {
+      isDarkTheme = !isDarkTheme;
+      const icon = document.getElementById('theme-icon');
+      
+      if (isDarkTheme) {
+        document.body.classList.add('dark-theme');
+        icon.textContent = '☀️';
+        console.log('🌙 Темная тема');
+      } else {
+        document.body.classList.remove('dark-theme');
+        icon.textContent = '🌙';
+        console.log('☀️ Светлая тема');
+      }
+      
+      // Сохраняем настройку
+      localStorage.setItem('darkTheme', isDarkTheme);
+    });
+    
+    // Загрузка настройки темы
+    const savedTheme = localStorage.getItem('darkTheme');
+    if (savedTheme === 'true') {
+      document.getElementById('theme-toggle').click();
+    }
+    
+    // Обработчики событий
+    document.getElementById('history-toggle').addEventListener('click', openHistoryModal);
+    document.getElementById('modal-close').addEventListener('click', closeHistoryModal);
+    
+    // Закрытие при клике на оверлей
+    document.getElementById('history-modal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeHistoryModal();
+      }
+    });
+    
+    // Обработчик клика для открытия/закрытия статистики
+    document.getElementById('stats-toggle').addEventListener('click', function(e) {
+      e.stopPropagation();
+      const dropdown = document.getElementById('stats-dropdown');
+      const icon = document.getElementById('stats-icon');
+      
+      dropdown.classList.toggle('show');
+      icon.classList.toggle('open');
+    });
+
+    // Закрытие при клике вне меню
+    document.addEventListener('click', function(e) {
+      const dropdown = document.getElementById('stats-dropdown');
+      const toggle = document.getElementById('stats-toggle');
+      const icon = document.getElementById('stats-icon');
+      
+      if (!toggle.contains(e.target)) {
+        dropdown.classList.remove('show');
+        icon.classList.remove('open');
+      }
+    });
+
     ws.onopen = () => {
       console.log('✅ Подключено к серверу');
     };
@@ -2031,14 +3449,12 @@
             const seconds = deal.timerSeconds % 60;
             timerValueEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
             
-            // Меняем цвет при малом времени
-            const timerEl = document.getElementById(`timer-${symbol}`);
-            if (timerEl) {
-              if (deal.timerSeconds <= 30) {
-                timerEl.style.background = 'linear-gradient(135deg, #fc8181, #f56565)';
-              } else if (deal.timerSeconds <= 60) {
-                timerEl.style.background = 'linear-gradient(135deg, #f6ad55, #ed8936)';
-              }
+            // Обновляем шкалу уверенности с правильным цветом
+            const confidenceFillEl = document.querySelector(`#timer-${symbol}`).parentElement.querySelector('.confidence-fill');
+            if (confidenceFillEl) {
+              const confidence = deal.confidence;
+              confidenceFillEl.className = `confidence-fill ${confidence >= 70 ? 'high' : confidence >= 40 ? 'medium' : 'low'}`;
+              confidenceFillEl.style.width = `${confidence}%`;
             }
           }
           
@@ -2046,6 +3462,9 @@
           if (deal.timerSeconds === 0) {
             console.log(`⏰ Время вышло для ${symbol}. Можно входить в сделку!`);
             // Здесь можно добавить логику автоматического входа в сделку
+            // Удаляем из localStorage
+            delete dealPrepData[symbol];
+            saveDealPrepData();
           }
         }
       });
@@ -2053,9 +3472,26 @@
 
     // Запускаем обновление таймеров каждую секунду
     setInterval(updateTimers, 1000);
+    
+    // Загружаем сохраненные данные при загрузке страницы
+    loadDealPrepData();
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
+      
+      // Обновляем цены в открытых позициях
+      updateOpenPositionsPrices(data);
+      
+      // Обновляем баланс и PnL (если есть открытые позиции)
+      if (openPositions.length > 0) {
+        updateBalanceDisplay();
+      }
+      
+      let longSignals = 0;
+      let shortSignals = 0;
+      let totalVolumeRatio = 0;
+      let totalRsi = 0;
+      let activeCoins = 0;
       
       // Обновляем каждую криптовалюту
       Object.keys(data).forEach(symbol => {
@@ -2070,8 +3506,28 @@
         if (data[symbol].analytics && data[symbol].orderBook) {
           updateSignalCard(symbol, data[symbol]);
         }
+        
+        // Собираем статистику для меню
+        if (data[symbol].analytics) {
+          activeCoins++;
+          const analytics = data[symbol].analytics;
+          
+          if (analytics.longPercentage >= 55) longSignals++;
+          if (analytics.shortPercentage >= 55) shortSignals++;
+          
+          if (analytics.volumeRatio) totalVolumeRatio += analytics.volumeRatio;
+          if (analytics.rsi) totalRsi += analytics.rsi;
+        }
       });
+      
+      // Обновляем верхнее меню
+      updateTopMenu(activeCoins, longSignals, shortSignals, totalVolumeRatio, totalRsi);
     };
+    
+    function updateTopMenu(activeCoins, longSignals, shortSignals, totalVolumeRatio, totalRsi) {
+      // Обновление меню происходит через updateBalanceDisplay()
+      // Эта функция больше не нужна для баланса/PnL
+    }
 
     ws.onerror = (error) => {
       console.error('❌ Ошибка WebSocket:', error);
@@ -2079,6 +3535,7 @@
 
     ws.onclose = () => {
       console.log('⚠️ Соединение закрыто');
+      document.getElementById('menu-status').textContent = 'Переподключение...';
       Object.keys(cryptoConfig).forEach(symbol => {
         const priceEl = document.getElementById(`price-${symbol}`);
         if (priceEl) priceEl.textContent = 'Переподключение...';

@@ -79,7 +79,7 @@ class TechnicalIndicators {
     this.candleData = {}; // Данные свечей для 15-минутного таймфрейма
   }
 
-  updateHistory(symbol, price, volume, timestamp, timeframe = '15m') {
+  updateHistory(symbol, price, volume, timestamp, timeframe = '15m', ohlc = null) {
     if (!this.priceHistory[symbol]) {
       this.priceHistory[symbol] = [];
       this.volumeHistory[symbol] = [];
@@ -97,22 +97,30 @@ class TechnicalIndicators {
     if (!candle) {
       candle = {
         time: candleTime,
-        open: price,
-        high: price,
-        low: price,
-        close: price,
+        open: ohlc ? ohlc.open : price,
+        high: ohlc ? ohlc.high : price,
+        low: ohlc ? ohlc.low : price,
+        close: ohlc ? ohlc.close : price,
         volume: volume,
         count: 1
       };
       this.candleData[symbol].push(candle);
     } else {
-      // Обновляем существующую свечу
-      candle.high = Math.max(candle.high, price);
-      candle.low = Math.min(candle.low, price);
-      candle.close = price;
-      // Для volume берем среднее, а не сумму (т.к. ticker.v - это 24h volume)
-      candle.volume = (candle.volume * candle.count + volume) / (candle.count + 1);
-      candle.count++;
+      // Если есть OHLC данные (из kline), полностью заменяем свечу
+      if (ohlc) {
+        candle.open = ohlc.open;
+        candle.high = ohlc.high;
+        candle.low = ohlc.low;
+        candle.close = ohlc.close;
+        candle.volume = volume;
+      } else {
+        // Для ticker данных (устаревший способ, но оставляем для совместимости)
+        candle.high = Math.max(candle.high, price);
+        candle.low = Math.min(candle.low, price);
+        candle.close = price;
+        candle.volume = (candle.volume * candle.count + volume) / (candle.count + 1);
+        candle.count++;
+      }
     }
 
     // Ограничиваем историю до 200 свечей (50 часов на 15-минутном таймфрейме)
@@ -782,7 +790,13 @@ async function fetchHistoricalData(symbol) {
     
     data.forEach(candle => {
       const [timestamp, open, high, low, close, volume] = candle;
-      indicators.updateHistory(symbol, parseFloat(close), parseFloat(volume), new Date(timestamp).toISOString(), '15m');
+      const ohlc = {
+        open: parseFloat(open),
+        high: parseFloat(high),
+        low: parseFloat(low),
+        close: parseFloat(close)
+      };
+      indicators.updateHistory(symbol, parseFloat(close), parseFloat(volume), new Date(timestamp).toISOString(), '15m', ohlc);
     });
     
     console.log(`✅ Исторические данные для ${symbol} загружены (${data.length} свечей)`);
@@ -792,9 +806,10 @@ async function fetchHistoricalData(symbol) {
 }
 
 function connectToBinance() {
-  // Создаем WebSocket для всех криптовалют
-  const streams = cryptos.map(symbol => `${symbol.toLowerCase()}@ticker`).join('/');
-  binanceWs = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
+  // Создаем WebSocket для kline (15-минутные свечи) + ticker для цены
+  const klineStreams = cryptos.map(symbol => `${symbol.toLowerCase()}@kline_15m`).join('/');
+  const tickerStreams = cryptos.map(symbol => `${symbol.toLowerCase()}@ticker`).join('/');
+  binanceWs = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${klineStreams}/${tickerStreams}`);
   
   binanceWs.on('open', () => {
     console.log('✅ Подключено к Binance WebSocket для всех монет');
@@ -802,31 +817,60 @@ function connectToBinance() {
 
   binanceWs.on('message', (data) => {
     const message = JSON.parse(data);
-    const ticker = message.data;
     
-    const price = parseFloat(ticker.c);
-    const volume = parseFloat(ticker.v);
-    const timestamp = new Date().toISOString();
+    // Обрабатываем kline данные (для EMA, индикаторов)
+    if (message.stream && message.stream.includes('@kline_')) {
+      const kline = message.data.k;
+      const symbol = kline.s;
+      const closePrice = parseFloat(kline.c);
+      const volume = parseFloat(kline.v);
+      const timestamp = new Date(kline.t).toISOString();
+      const isClosed = kline.x; // true если свеча закрылась
+      
+      // Передаем полные OHLC данные из kline
+      const ohlc = {
+        open: parseFloat(kline.o),
+        high: parseFloat(kline.h),
+        low: parseFloat(kline.l),
+        close: parseFloat(kline.c)
+      };
+      
+      // Обновляем историю для расчета индикаторов из РЕАЛЬНЫХ 15-минутных свечей
+      // Обновляем постоянно, чтобы текущая свеча была актуальной
+      indicators.updateHistory(symbol, closePrice, volume, timestamp, '15m', ohlc);
+      
+      // Логируем только когда свеча закрывается
+      if (isClosed && symbol === 'BTCUSDT') {
+        const analytics = indicators.getAnalytics(symbol);
+        console.log(`🕯️ ${symbol} свеча закрылась: Close=${closePrice}`);
+        console.log(`   EMA 9:  ${analytics.ema9.toFixed(2)}`);
+        console.log(`   EMA 21: ${analytics.ema21.toFixed(2)}`);
+        console.log(`   EMA 50: ${analytics.ema50.toFixed(2)}`);
+      }
+    }
     
-    cryptoPrices[ticker.s] = {
-      symbol: ticker.s,
-      price: price,
-      change24h: parseFloat(ticker.P),
-      high24h: parseFloat(ticker.h),
-      low24h: parseFloat(ticker.l),
-      volume24h: volume,
-      timestamp: timestamp,
-      rawData: ticker.c
-    };
+    // Обрабатываем ticker данные (для текущей цены, 24h статистики)
+    if (message.stream && message.stream.includes('@ticker')) {
+      const ticker = message.data;
+      
+      const price = parseFloat(ticker.c);
+      const volume = parseFloat(ticker.v);
+      const timestamp = new Date().toISOString();
+      
+      cryptoPrices[ticker.s] = {
+        symbol: ticker.s,
+        price: price,
+        change24h: parseFloat(ticker.P),
+        high24h: parseFloat(ticker.h),
+        low24h: parseFloat(ticker.l),
+        volume24h: volume,
+        timestamp: timestamp,
+        rawData: ticker.c
+      };
 
-    // Обновляем историю для расчета индикаторов (15-минутный таймфрейм)
-    indicators.updateHistory(ticker.s, price, volume, timestamp, '15m');
-
-
-    // console.log(`📊 ${ticker.s}: $${price}`);
-
-    // Отправляем обновленные данные всем клиентам
-    sendAllPricesToClients();
+      // Отправляем обновленные данные всем клиентам
+      sendAllPricesToClients();
+    }
   });
 
   binanceWs.on('error', (error) => {
