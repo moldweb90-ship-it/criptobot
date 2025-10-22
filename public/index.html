@@ -1025,7 +1025,10 @@
         </div>
         
         <div class="indicator">
-          <div class="indicator-label">Spread</div>
+          <div class="indicator-label-container">
+            <div class="dot neutral" id="spread-dot-${symbol}"></div>
+            <div class="indicator-label">Spread</div>
+          </div>
           <div class="indicator-value" id="spread-${symbol}">--</div>
         </div>
         
@@ -1169,6 +1172,9 @@
           
           // Обновляем ATR сигнал
           updateAtrSignal(symbol, analytics);
+          
+          // Обновляем Spread сигнал
+          updateSpreadSignal(symbol, analytics);
         
         // MACD
         if (analytics.macd) {
@@ -1541,6 +1547,43 @@
         }
         
         console.log(`ATR ${symbol} dot updated: ${signal} color`);
+      }
+      
+      function updateSpreadSignal(symbol, analytics) {
+        const spreadDot = document.getElementById(`spread-dot-${symbol}`);
+        if (!spreadDot) {
+          console.log(`Spread dot not found for ${symbol}`);
+          return;
+        }
+      
+        const signal = analytics.spreadSignal || 'neutral';
+        const confidence = analytics.spreadConfidence || 0;
+        
+        console.log(`Spread ${symbol}: signal=${signal}, confidence=${confidence}`);
+        
+        // Spread - ромбики (borderRadius: 2px + rotate 45deg)
+        spreadDot.style.borderRadius = '2px';
+        spreadDot.style.transform = 'rotate(45deg)';
+        
+        // Обновляем цвет ромба в зависимости от сигнала
+        switch (signal) {
+          case 'long':
+            // Зелёный ромб - узкий спред (хорошие условия)
+            spreadDot.className = 'dot green';
+            spreadDot.innerHTML = '';
+            break;
+          case 'short':
+            // Красный ромб - широкий спред (плохие условия)
+            spreadDot.className = 'dot red';
+            spreadDot.innerHTML = '';
+            break;
+          default:
+            // Серый ромб - нормальный спред
+            spreadDot.className = 'dot neutral';
+            spreadDot.innerHTML = '';
+        }
+        
+        console.log(`Spread ${symbol} dot updated: ${signal} color`);
       }
 
     function updateIndicator(elementId, value, type) {

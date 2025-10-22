@@ -361,7 +361,7 @@ class TechnicalIndicators {
           
           if (timeInLongRange >= CONFIRMATION_TIME) {
             // Подтверждено 20 секунд в диапазоне
-            bidAskConfidence = 20;
+            bidAskConfidence = 5;
             bidAskSignal = 'long';
           }
           
@@ -378,7 +378,7 @@ class TechnicalIndicators {
           
           if (timeInShortRange >= CONFIRMATION_TIME) {
             // Подтверждено 20 секунд в диапазоне
-            bidAskConfidence = 20;
+            bidAskConfidence = 5;
             bidAskSignal = 'short';
           }
           
@@ -516,28 +516,34 @@ class TechnicalIndicators {
       const isRsiShortSignal = rsiSignal === 'short-weak' || rsiSignal === 'short-strong' || rsiSignal === 'short-extreme';
       
       if (isUptrend) {
-        longPercentage = 20 + (isLongSignal ? bidAskConfidence : 0) + (isVolumeLongSignal ? volumeConfidence : 0) + (isRsiLongSignal ? rsiConfidence : 0);
+        longPercentage = 20 + (isLongSignal ? bidAskConfidence : 0);
       } else if (isDowntrend) {
-        shortPercentage = 20 + (isShortSignal ? bidAskConfidence : 0) + (isVolumeShortSignal ? volumeConfidence : 0) + (isRsiShortSignal ? rsiConfidence : 0);
+        shortPercentage = 20 + (isShortSignal ? bidAskConfidence : 0);
         // НО Bid/Ask LONG сигнал все равно добавляет уверенность к LONG
         if (isLongSignal && bidAskConfidence > 0) {
-          longPercentage = bidAskConfidence + (isVolumeLongSignal ? volumeConfidence : 0) + (isRsiLongSignal ? rsiConfidence : 0);
+          longPercentage = bidAskConfidence;
         }
       } else {
-        // Если EMA нейтральный, но есть Bid/Ask, Volume или RSI сигнал
+        // Если EMA нейтральный, но есть Bid/Ask сигнал
         if (isLongSignal && bidAskConfidence > 0) {
-          longPercentage = bidAskConfidence + (isVolumeLongSignal ? volumeConfidence : 0) + (isRsiLongSignal ? rsiConfidence : 0);
+          longPercentage = bidAskConfidence;
         } else if (isShortSignal && bidAskConfidence > 0) {
-          shortPercentage = bidAskConfidence + (isVolumeShortSignal ? volumeConfidence : 0) + (isRsiShortSignal ? rsiConfidence : 0);
+          shortPercentage = bidAskConfidence;
         }
       }
       
       // ВСЕГДА добавляем Volume и RSI сигналы, независимо от EMA тренда
-      if (isVolumeLongSignal || isRsiLongSignal) {
-        longPercentage += (isVolumeLongSignal ? volumeConfidence : 0) + (isRsiLongSignal ? rsiConfidence : 0);
+      if (isVolumeLongSignal) {
+        longPercentage += volumeConfidence;
       }
-      if (isVolumeShortSignal || isRsiShortSignal) {
-        shortPercentage += (isVolumeShortSignal ? volumeConfidence : 0) + (isRsiShortSignal ? rsiConfidence : 0);
+      if (isRsiLongSignal) {
+        longPercentage += rsiConfidence;
+      }
+      if (isVolumeShortSignal) {
+        shortPercentage += volumeConfidence;
+      }
+      if (isRsiShortSignal) {
+        shortPercentage += rsiConfidence;
       }
       
       // Анализ Liquidity Ratio на 15-минутном таймфрейме
@@ -551,11 +557,11 @@ class TechnicalIndicators {
         if (liquidityRatio >= 1.30) {
           // Ликвидность выросла на 30%+ за 15 минут → сильный LONG
           liquiditySignal = 'long';
-          liquidityConfidence = 5;
+          liquidityConfidence = 5; // +5% к LONG (второстепенный)
         } else if (liquidityRatio < 0.70) {
           // Ликвидность упала на 30%+ за 15 минут → сильный SHORT
           liquiditySignal = 'short';
-          liquidityConfidence = 5;
+          liquidityConfidence = 5; // +5% к SHORT (второстепенный)
         } else {
           // Стабильная ликвидность (0.70-1.30) → нейтрально
           liquiditySignal = 'neutral';
@@ -584,22 +590,22 @@ class TechnicalIndicators {
         // Основной сигнал: MACD vs Signal
         if (macd.macd > macd.signal) {
           macdSignal = 'long';
-          macdConfidence = 10; // +10% к LONG
+          macdConfidence = 15; // +15% к LONG
         } else if (macd.macd < macd.signal) {
           macdSignal = 'short';
-          macdConfidence = 10; // +10% к SHORT
+          macdConfidence = 15; // +15% к SHORT
         }
         
         // Дополнительный сигнал: Histogram (сила momentum)
         if (macd.histogram > 0) {
           // Histogram положительный - momentum растет
           if (macdSignal === 'long') {
-            macdConfidence += 5; // Усиливаем LONG сигнал
+            macdConfidence += 5; // Усиливаем LONG сигнал до +20%
           }
         } else if (macd.histogram < 0) {
           // Histogram отрицательный - momentum падает
           if (macdSignal === 'short') {
-            macdConfidence += 5; // Усиливаем SHORT сигнал
+            macdConfidence += 5; // Усиливаем SHORT сигнал до +20%
           }
         }
       }
@@ -615,6 +621,10 @@ class TechnicalIndicators {
       const atr = priceArrayLength >= 3 ? this.calculateATR(priceArray, Math.min(14, priceArrayLength - 1)) : 0;
       let atrConfidence = 0;
       let atrSignal = 'neutral'; // neutral, long, short
+      
+      // Spread анализ
+      let spreadConfidence = 0;
+      let spreadSignal = 'neutral'; // neutral, long, short
       
       // Пороги волатильности для каждой монеты (для тейков 0.20-0.30%)
       const ATR_THRESHOLDS = {
@@ -634,11 +644,11 @@ class TechnicalIndicators {
         if (isUptrend) {
           // Все EMA зеленые → ATR зеленый
           atrSignal = 'long';
-          atrConfidence = 10; // +10% к LONG
+          atrConfidence = 15; // +15% к LONG
         } else if (isDowntrend) {
           // Все EMA красные → ATR красный
           atrSignal = 'short';
-          atrConfidence = 10; // +10% к SHORT
+          atrConfidence = 15; // +15% к SHORT
         } else {
           // EMA нейтральные → ATR серый
           atrSignal = 'neutral';
@@ -655,6 +665,34 @@ class TechnicalIndicators {
         longPercentage += atrConfidence;
       } else if (atrSignal === 'short') {
         shortPercentage += atrConfidence;
+      }
+      
+      // Анализ Spread для дополнительной уверенности
+      const spreadPercent = orderBookData && orderBookData[symbol] ? orderBookData[symbol].spreadPercent : 0;
+      
+      if (spreadPercent <= 0.0005) {
+        // Очень узкий спред (≤0.0005%) - хорошие условия для торговли
+        spreadSignal = 'long';
+        spreadConfidence = 5; // +5% к LONG
+      } else if (spreadPercent <= 0.001) {
+        // Узкий спред (≤0.001%) - нормальные условия
+        spreadSignal = 'neutral';
+        spreadConfidence = 0;
+      } else if (spreadPercent <= 0.005) {
+        // Средний спред (≤0.005%) - осторожность
+        spreadSignal = 'neutral';
+        spreadConfidence = 0;
+      } else {
+        // Широкий спред (>0.005%) - плохие условия
+        spreadSignal = 'short';
+        spreadConfidence = 5; // +5% к SHORT
+      }
+      
+      // Добавляем Spread сигналы к процентам
+      if (spreadSignal === 'long') {
+        longPercentage += spreadConfidence;
+      } else if (spreadSignal === 'short') {
+        shortPercentage += spreadConfidence;
       }
     
     return {
@@ -689,7 +727,10 @@ class TechnicalIndicators {
       macdSignal: macdSignal,
       // ATR анализ
       atrConfidence: atrConfidence,
-      atrSignal: atrSignal
+      atrSignal: atrSignal,
+      // Spread анализ
+      spreadConfidence: spreadConfidence,
+      spreadSignal: spreadSignal
     };
   }
 }
