@@ -407,16 +407,16 @@ class TechnicalIndicators {
         const filtered = last20.filter(v => v <= threshold);
         const anomalies = last20.filter(v => v > threshold);
         
-        console.log(`🔍 ${symbol} Volume Ratio Analysis:`, {
-          volumeHistoryLength: volumeArray.length,
-          volumeRatio: volumeRatio ? volumeRatio.toFixed(2) : 'null',
-          median: median.toFixed(0),
-          threshold: threshold.toFixed(0),
-          anomaliesDetected: anomalies.length,
-          anomalyValues: anomalies.map(v => v.toFixed(0)),
-          filteredCount: filtered.length,
-          recentVolumes: volumeValues.slice(-5).map(v => v.toFixed(0))
-        });
+        // console.log(`🔍 ${symbol} Volume Ratio Analysis:`, {
+        //   volumeHistoryLength: volumeArray.length,
+        //   volumeRatio: volumeRatio ? volumeRatio.toFixed(2) : 'null',
+        //   median: median.toFixed(0),
+        //   threshold: threshold.toFixed(0),
+        //   anomaliesDetected: anomalies.length,
+        //   anomalyValues: anomalies.map(v => v.toFixed(0)),
+        //   filteredCount: filtered.length,
+        //   recentVolumes: volumeValues.slice(-5).map(v => v.toFixed(0))
+        // });
       }
       
       // Анализ Volume Ratio для определения силы тренда
@@ -858,7 +858,7 @@ function connectToDepth() {
     const symbol = message.stream.split('@')[0].toUpperCase();
     
     // Отладочная информация
-    console.log('🔍 Depth message:', message.stream, 'Symbol:', symbol);
+    // console.log('🔍 Depth message:', message.stream, 'Symbol:', symbol);
     
     // Проверяем что у нас есть все необходимые данные
     if (!symbol || !depth.bids || !depth.asks || depth.bids.length === 0 || depth.asks.length === 0) {
@@ -949,7 +949,7 @@ function connectToDepth() {
       timestamp: new Date().toISOString()
     };
 
-    console.log(`📊 ${symbol} OrderBook: Spread ${spreadPercent.toFixed(4)}%, Liquidity (±0.10%): $${totalLiquidity.toFixed(2)}, B/A Ratio: ${rawBidAskRatio.toFixed(2)}x → ${clampedRatio.toFixed(2)}x (filtered)`);
+    // console.log(`📊 ${symbol} OrderBook: Spread ${spreadPercent.toFixed(4)}%, Liquidity (±0.10%): $${totalLiquidity.toFixed(2)}, B/A Ratio: ${rawBidAskRatio.toFixed(2)}x → ${clampedRatio.toFixed(2)}x (filtered)`);
 
     // Отправляем обновленные данные всем клиентам
     sendAllPricesToClients();
