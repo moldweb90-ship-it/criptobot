@@ -224,7 +224,6 @@
       display: grid;
       grid-template-columns: repeat(6, 1fr);
       gap: 15px;
-      max-width: 1400px;
       margin: 0 auto;
     }
 
@@ -629,6 +628,7 @@
       border: 1px solid #e2e8f0;
     }
 
+
     /* Торговые сигналы */
     .signals-section {
       margin-top: 30px;
@@ -997,7 +997,10 @@
         </div>
         
         <div class="indicator">
-          <div class="indicator-label">MACD</div>
+          <div class="indicator-label-container">
+            <div class="dot neutral" id="macd-dot-${symbol}"></div>
+            <div class="indicator-label">MACD</div>
+          </div>
           <div class="indicator-value" id="macd-${symbol}">--</div>
           <div class="macd-values" id="macd-details-${symbol}">
             <div class="macd-item">Signal: --</div>
@@ -1006,7 +1009,10 @@
         </div>
         
         <div class="indicator">
-          <div class="indicator-label">ATR (14)</div>
+          <div class="indicator-label-container">
+            <div class="dot neutral" id="atr-dot-${symbol}"></div>
+            <div class="indicator-label">ATR (14)</div>
+          </div>
           <div class="indicator-value" id="atr-${symbol}">--</div>
         </div>
         
@@ -1024,7 +1030,10 @@
         </div>
         
         <div class="indicator liquidity">
-          <div class="indicator-label">Liquidity (±0.10%)</div>
+          <div class="indicator-label-container">
+            <div class="dot neutral" id="liquidity-dot-${symbol}"></div>
+            <div class="indicator-label">Liquidity (±0.10%)</div>
+          </div>
           <div class="indicator-value" id="liquidity-${symbol}">--</div>
         </div>
         
@@ -1151,6 +1160,15 @@
           
           // Обновляем RSI сигнал
           updateRsiSignal(symbol, analytics);
+          
+          // Обновляем Liquidity сигнал
+          updateLiquiditySignal(symbol, analytics);
+          
+          // Обновляем MACD сигнал
+          updateMacdSignal(symbol, analytics);
+          
+          // Обновляем ATR сигнал
+          updateAtrSignal(symbol, analytics);
         
         // MACD
         if (analytics.macd) {
@@ -1240,15 +1258,19 @@
         const signal = analytics.bidAskSignal || 'neutral';
         const ratio = analytics.bidAskRatio || 1.0;
         
-        // Обновляем цвет кружка в зависимости от силы сигнала
+        // Bid/Ask - ромбики (borderRadius: 2px + rotate 45deg)
+        bidAskDot.style.borderRadius = '2px';
+        bidAskDot.style.transform = 'rotate(45deg)';
+        
+        // Обновляем цвет ромба в зависимости от силы сигнала
         switch (signal) {
           case 'long':
-            // Зелёный кружок - устойчивое доминирование покупателей (2.0x-5.0x)
+            // Зелёный ромб - устойчивое доминирование покупателей (2.0x-5.0x)
             bidAskDot.className = 'dot green';
             bidAskDot.innerHTML = '';
             break;
           case 'short':
-            // Красный кружок - явный перекос в сторону продавцов (0.10x-0.90x)
+            // Красный ромб - явный перекос в сторону продавцов (0.10x-0.90x)
             bidAskDot.className = 'dot red';
             bidAskDot.innerHTML = '';
             break;
@@ -1281,15 +1303,19 @@
         const signal = analytics.volumeSignal || 'neutral';
         const ratio = analytics.volumeRatio;
         
-        // Обновляем цвет кружка в зависимости от силы сигнала
+        // Volume - квадратики (borderRadius: 2px)
+        volumeDot.style.borderRadius = '2px';
+        volumeDot.style.transform = 'none';
+        
+        // Обновляем цвет квадрата в зависимости от силы сигнала
         switch (signal) {
           case 'long-weak':
-            // Зелёный кружок - объем растет (1.5-1.99)
+            // Зелёный квадрат - объем растет (1.5-1.99)
             volumeDot.className = 'dot green';
             volumeDot.innerHTML = '';
             break;
           case 'long-strong':
-            // Зелёный кружок - сильный рост объема (2.0-2.99)
+            // Зелёный квадрат - сильный рост объема (2.0-2.99)
             volumeDot.className = 'dot green';
             volumeDot.innerHTML = '';
             break;
@@ -1350,15 +1376,19 @@
         const signal = analytics.rsiSignal || 'neutral';
         const rsi = analytics.rsi || 50;
         
-        // Обновляем цвет кружка в зависимости от силы сигнала
+        // RSI - квадратики (borderRadius: 2px)
+        rsiDot.style.borderRadius = '2px';
+        rsiDot.style.transform = 'none';
+        
+        // Обновляем цвет квадрата в зависимости от силы сигнала
         switch (signal) {
           case 'long-extreme':
-            // Зелёный кружок - экстремальная перепроданность (15-30)
+            // Зелёный квадрат - экстремальная перепроданность (15-30)
             rsiDot.className = 'dot green';
             rsiDot.innerHTML = '';
             break;
           case 'long-strong':
-            // Зелёный кружок - сильная перепроданность (30-40)
+            // Зелёный квадрат - сильная перепроданность (30-40)
             rsiDot.className = 'dot green';
             rsiDot.innerHTML = '';
             break;
@@ -1401,6 +1431,118 @@
         }
       }
 
+      function updateLiquiditySignal(symbol, analytics) {
+        const liquidityDot = document.getElementById(`liquidity-dot-${symbol}`);
+        if (!liquidityDot) return;
+      
+        const signal = analytics.liquiditySignal || 'neutral';
+        const ratio = analytics.liquidityRatio;
+        
+        // Liquidity - ромбики (borderRadius: 2px + rotate 45deg)
+        liquidityDot.style.borderRadius = '2px';
+        liquidityDot.style.transform = 'rotate(45deg)';
+        
+        // Обновляем цвет ромба в зависимости от сигнала
+        switch (signal) {
+          case 'long':
+            // Зелёный ромб - ликвидность растет (>= 1.15)
+            liquidityDot.className = 'dot green';
+            liquidityDot.innerHTML = '';
+            break;
+          case 'short':
+            // Красный ромб - ликвидность падает (< 0.85)
+            liquidityDot.className = 'dot red';
+            liquidityDot.innerHTML = '';
+            break;
+          default:
+            // Серый кружок - стабильная ликвидность (0.85-1.15)
+            liquidityDot.className = 'dot neutral';
+            liquidityDot.innerHTML = '';
+        }
+        
+        // Обновляем значение Liquidity
+        const liquidityElement = document.getElementById(`liquidity-${symbol}`);
+        if (liquidityElement && analytics.orderBook) {
+          const liq = analytics.orderBook.totalLiquidity;
+          let displayText = liq >= 1000000 
+            ? `$${(liq / 1000000).toFixed(2)}M` 
+            : `$${(liq / 1000).toFixed(0)}k`;
+          
+          if (ratio !== null) {
+            displayText += ` (${ratio.toFixed(2)})`;
+          }
+          
+          if (analytics.liquidityConfidence > 0) {
+            displayText += ` +${analytics.liquidityConfidence}%`;
+          }
+          
+          liquidityElement.textContent = displayText;
+        }
+      }
+
+      function updateMacdSignal(symbol, analytics) {
+        const macdDot = document.getElementById(`macd-dot-${symbol}`);
+        if (!macdDot) return;
+      
+        const signal = analytics.macdSignal || 'neutral';
+        const confidence = analytics.macdConfidence || 0;
+        
+        // Обновляем цвет кружка в зависимости от сигнала
+        switch (signal) {
+          case 'long':
+            // Зелёный кружок - MACD > Signal (momentum растет)
+            macdDot.className = 'dot green';
+            macdDot.innerHTML = '';
+            break;
+          case 'short':
+            // Красный кружок - MACD < Signal (momentum падает)
+            macdDot.className = 'dot red';
+            macdDot.innerHTML = '';
+            break;
+          default:
+            // Серый кружок - нейтральный сигнал
+            macdDot.className = 'dot neutral';
+            macdDot.innerHTML = '';
+        }
+      }
+
+      function updateAtrSignal(symbol, analytics) {
+        const atrDot = document.getElementById(`atr-dot-${symbol}`);
+        if (!atrDot) {
+          console.log(`ATR dot not found for ${symbol}`);
+          return;
+        }
+      
+        const signal = analytics.atrSignal || 'neutral';
+        const confidence = analytics.atrConfidence || 0;
+        
+        console.log(`ATR ${symbol}: signal=${signal}, confidence=${confidence}, atr=${analytics.atr}`);
+        
+        // ATR - ромбики (borderRadius: 2px + rotate 45deg)
+        atrDot.style.borderRadius = '2px';
+        atrDot.style.transform = 'rotate(45deg)';
+        
+        // Обновляем цвет ромба в зависимости от сигнала
+        switch (signal) {
+          case 'long':
+            // Зелёный ромб - ATR в диапазоне + EMA в LONG
+            atrDot.className = 'dot green';
+            atrDot.innerHTML = '';
+            break;
+          case 'short':
+            // Красный ромб - ATR в диапазоне + EMA в SHORT
+            atrDot.className = 'dot red';
+            atrDot.innerHTML = '';
+            break;
+          default:
+            // Серый ромб - ATR вне диапазона или EMA нейтральны
+            atrDot.className = 'dot neutral';
+            atrDot.innerHTML = '';
+        }
+        
+        console.log(`ATR ${symbol} dot updated: ${signal} color`);
+      }
+
     function updateIndicator(elementId, value, type) {
       const element = document.getElementById(elementId);
       if (!element || value === null || value === undefined) return;
@@ -1410,7 +1552,7 @@
 
       switch (type) {
         case 'price':
-          formattedValue = `$${value.toFixed(2)}`;
+          formattedValue = `$${value.toFixed(4)}`;
           break;
         case 'rsi':
           formattedValue = value.toFixed(2);

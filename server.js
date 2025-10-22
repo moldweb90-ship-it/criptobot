@@ -42,7 +42,20 @@ let rangeEntryTime = {
   short: {}
 };
 
+// Хранилище истории ликвидности для каждой монеты
+let liquidityHistory = {}; // { BTCUSDT: [value1, value2, ...], ... }
+
+// Хранилище предыдущих сигналов Liquidity для фиксации тренда
+let previousLiquiditySignal = {}; // { BTCUSDT: 'neutral', ... }
+
+// Счетчик подтверждений для Liquidity (требуем 3 раза подряд)
+let liquidityConfirmationCount = {
+  long: {},   // { BTCUSDT: 0, ... }
+  short: {}
+};
+
 const CONFIRMATION_TIME = 20000; // 20 секунд в миллисекундах
+const LIQUIDITY_CONFIRMATION_REQUIRED = 3; // Требуем 3 подтверждения подряд
 
 // Функция для расчета EWMA (Exponentially Weighted Moving Average)
 function calculateEWMA(currentValue, previousValue, alpha = 0.3) {
@@ -249,6 +262,27 @@ class TechnicalIndicators {
     const ratio = avgRecent / avgOlder;
     
     return ratio;
+  }
+
+  calculateLiquidityRatio(liquidityValues) {
+    // Требуем минимум 2 свечи (2 x 15 минут = 30 минут истории)
+    if (liquidityValues.length < 120) return null;
+    
+    // Берем последние 1800 значений (~30 минут, т.к. обновления каждую секунду)
+    const last1800 = liquidityValues.slice(-1800);
+    
+    // Делим на две части по 15 минут каждая:
+    // Текущие 15 минут (последние 900 значений)
+    const currentCandle = last1800.slice(-900);
+    // Предыдущие 15 минут (предыдущие 900 значений)
+    const previousCandle = last1800.slice(-1800, -900);
+    
+    // Вычисляем среднюю ликвидность за каждый период
+    const currentAvg = currentCandle.reduce((sum, liq) => sum + liq, 0) / currentCandle.length;
+    const previousAvg = previousCandle.reduce((sum, liq) => sum + liq, 0) / previousCandle.length;
+    
+    // Возвращаем отношение текущей свечи к предыдущей
+    return currentAvg / previousAvg;
   }
 
   getAnalytics(symbol) {
@@ -505,6 +539,123 @@ class TechnicalIndicators {
       if (isVolumeShortSignal || isRsiShortSignal) {
         shortPercentage += (isVolumeShortSignal ? volumeConfidence : 0) + (isRsiShortSignal ? rsiConfidence : 0);
       }
+      
+      // Анализ Liquidity Ratio на 15-минутном таймфрейме
+      const liquidityArray = liquidityHistory[symbol] || [];
+      const liquidityRatio = liquidityArray.length >= 120 ? this.calculateLiquidityRatio(liquidityArray) : null;
+      let liquidityConfidence = 0;
+      let liquiditySignal = 'neutral'; // neutral, long, short
+      
+      if (liquidityRatio !== null) {
+        // Упрощенная логика: только экстремальные изменения
+        if (liquidityRatio >= 1.30) {
+          // Ликвидность выросла на 30%+ за 15 минут → сильный LONG
+          liquiditySignal = 'long';
+          liquidityConfidence = 5;
+        } else if (liquidityRatio < 0.70) {
+          // Ликвидность упала на 30%+ за 15 минут → сильный SHORT
+          liquiditySignal = 'short';
+          liquidityConfidence = 5;
+        } else {
+          // Стабильная ликвидность (0.70-1.30) → нейтрально
+          liquiditySignal = 'neutral';
+          liquidityConfidence = 0;
+        }
+      }
+      
+      // Определяем тип Liquidity сигнала
+      const isLiquidityLongSignal = liquiditySignal === 'long';
+      const isLiquidityShortSignal = liquiditySignal === 'short';
+      
+      // Добавляем Liquidity сигналы к процентам
+      if (isLiquidityLongSignal) {
+        longPercentage += liquidityConfidence;
+      }
+      if (isLiquidityShortSignal) {
+        shortPercentage += liquidityConfidence;
+      }
+
+      // Анализ MACD для определения momentum
+      const macd = priceArrayLength >= 3 ? this.calculateMACD(priceArray) : { macd: 0, signal: 0, histogram: 0 };
+      let macdConfidence = 0;
+      let macdSignal = 'neutral'; // neutral, long, short
+      
+      if (macd.macd !== 0 && macd.signal !== 0) {
+        // Основной сигнал: MACD vs Signal
+        if (macd.macd > macd.signal) {
+          macdSignal = 'long';
+          macdConfidence = 10; // +10% к LONG
+        } else if (macd.macd < macd.signal) {
+          macdSignal = 'short';
+          macdConfidence = 10; // +10% к SHORT
+        }
+        
+        // Дополнительный сигнал: Histogram (сила momentum)
+        if (macd.histogram > 0) {
+          // Histogram положительный - momentum растет
+          if (macdSignal === 'long') {
+            macdConfidence += 5; // Усиливаем LONG сигнал
+          }
+        } else if (macd.histogram < 0) {
+          // Histogram отрицательный - momentum падает
+          if (macdSignal === 'short') {
+            macdConfidence += 5; // Усиливаем SHORT сигнал
+          }
+        }
+      }
+
+      // Добавляем MACD сигналы к процентам
+      if (macdSignal === 'long') {
+        longPercentage += macdConfidence;
+      } else if (macdSignal === 'short') {
+        shortPercentage += macdConfidence;
+      }
+
+      // Анализ ATR для фильтрации по волатильности
+      const atr = priceArrayLength >= 3 ? this.calculateATR(priceArray, Math.min(14, priceArrayLength - 1)) : 0;
+      let atrConfidence = 0;
+      let atrSignal = 'neutral'; // neutral, long, short
+      
+      // Пороги волатильности для каждой монеты (для тейков 0.20-0.30%)
+      const ATR_THRESHOLDS = {
+        'BTCUSDT': { low: 150, high: 500 },
+        'ETHUSDT': { low: 5, high: 20 },
+        'SOLUSDT': { low: 0.25, high: 1.0 },
+        'BNBUSDT': { low: 1.5, high: 7 },
+        'XRPUSDT': { low: 0.004, high: 0.015 },
+        'DOGEUSDT': { low: 0.0001, high: 0.0005 }
+      };
+      
+      const thresholds = ATR_THRESHOLDS[symbol];
+      
+      if (thresholds && atr >= thresholds.low && atr <= thresholds.high) {
+        // ATR в нормальном диапазоне
+        // Определяем направление EMA
+        if (isUptrend) {
+          // Все EMA зеленые → ATR зеленый
+          atrSignal = 'long';
+          atrConfidence = 10; // +10% к LONG
+        } else if (isDowntrend) {
+          // Все EMA красные → ATR красный
+          atrSignal = 'short';
+          atrConfidence = 10; // +10% к SHORT
+        } else {
+          // EMA нейтральные → ATR серый
+          atrSignal = 'neutral';
+          atrConfidence = 0;
+        }
+      } else {
+        // ATR вне диапазона → ATR серый
+        atrSignal = 'neutral';
+        atrConfidence = 0;
+      }
+      
+      // Добавляем ATR сигналы к процентам
+      if (atrSignal === 'long') {
+        longPercentage += atrConfidence;
+      } else if (atrSignal === 'short') {
+        shortPercentage += atrConfidence;
+      }
     
     return {
       ema9: ema9,
@@ -512,7 +663,7 @@ class TechnicalIndicators {
       ema50: ema50,
       rsi: rsi,
       macd: priceArrayLength >= 3 ? this.calculateMACD(priceArray) : { macd: 0, signal: 0, histogram: 0 },
-      atr: priceArrayLength >= 3 ? this.calculateATR(priceArray, Math.min(14, priceArrayLength - 1)) : 0,
+      atr: atr,
       volumeRatio: volumeRatio,
       // Новые поля для тренда
       isUptrend: isUptrend,
@@ -528,7 +679,17 @@ class TechnicalIndicators {
       volumeSignal: volumeSignal,
       // RSI анализ
       rsiConfidence: rsiConfidence,
-      rsiSignal: rsiSignal
+      rsiSignal: rsiSignal,
+      // Liquidity анализ
+      liquidityRatio: liquidityRatio,
+      liquidityConfidence: liquidityConfidence,
+      liquiditySignal: liquiditySignal,
+      // MACD анализ
+      macdConfidence: macdConfidence,
+      macdSignal: macdSignal,
+      // ATR анализ
+      atrConfidence: atrConfidence,
+      atrSignal: atrSignal
     };
   }
 }
@@ -696,6 +857,17 @@ function connectToDepth() {
     }, 0);
     
     const totalLiquidity = bidVolumeUSD + askVolumeUSD;
+    
+    // Сохраняем историю ликвидности для расчета Liquidity Ratio
+    if (!liquidityHistory[symbol]) {
+      liquidityHistory[symbol] = [];
+    }
+    liquidityHistory[symbol].push(totalLiquidity);
+    
+    // Ограничиваем историю до 1800 последних значений (~30 минут)
+    if (liquidityHistory[symbol].length > 1800) {
+      liquidityHistory[symbol].shift();
+    }
     
     // Дополнительная информация о ликвидности (топ-5 уровней)
     const top5BidVolumeUSD = depth.bids.slice(0, 5).reduce((sum, [price, volume]) => {
