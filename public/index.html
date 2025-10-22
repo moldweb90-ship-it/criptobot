@@ -404,6 +404,119 @@
       color: #2d3748;
     }
 
+    .trend-indicators {
+      margin-left: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .trend-line {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .trend-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .trend-percentage {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      color: #4a5568;
+      transition: all 0.3s ease;
+    }
+
+    .trend-percentage.long-active {
+      background: #48bb78;
+      color: white;
+    }
+
+    .trend-percentage.short-active {
+      background: #f56565;
+      color: white;
+    }
+
+    .indicator-label-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .dot.green {
+      background: #48bb78;
+    }
+
+    .dot.red {
+      background: #f56565;
+    }
+
+    .dot.neutral {
+      background: #e2e8f0;
+    }
+
+    .indicator-value-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .trend-indicator {
+      font-size: 14px;
+      font-weight: bold;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    .trend-indicator.positive {
+      background: #48bb78;
+      color: white;
+    }
+
+    .trend-indicator.positive::after {
+      content: '✓';
+    }
+
+    .trend-indicator.negative {
+      background: #f56565;
+      color: white;
+    }
+
+    .trend-indicator.negative::after {
+      content: '↓';
+    }
+
+    .trend-indicator.neutral {
+      background: #e2e8f0;
+      color: #718096;
+    }
+
+    .trend-indicator.neutral::after {
+      content: '--';
+      font-size: 10px;
+    }
+
     .indicator {
       display: flex;
       justify-content: space-between;
@@ -789,20 +902,39 @@
         <div class="analytics-header">
           <div class="analytics-icon ${config.class}">${config.symbol}</div>
           <div class="analytics-name">${config.name}</div>
+          <div class="trend-indicators">
+            <div class="trend-line">
+              <span class="trend-label">LONG:</span>
+              <span class="trend-percentage" id="long-percentage-${symbol}">0%</span>
+            </div>
+            <div class="trend-line">
+              <span class="trend-label">SHORT:</span>
+              <span class="trend-percentage" id="short-percentage-${symbol}">0%</span>
+            </div>
+          </div>
         </div>
         
         <div class="indicator">
-          <div class="indicator-label">EMA 9</div>
+          <div class="indicator-label-container">
+            <div class="dot neutral" id="dot1-${symbol}"></div>
+            <div class="indicator-label">EMA 9</div>
+          </div>
           <div class="indicator-value" id="ema9-${symbol}">--</div>
         </div>
         
         <div class="indicator">
-          <div class="indicator-label">EMA 21</div>
+          <div class="indicator-label-container">
+            <div class="dot neutral" id="dot2-${symbol}"></div>
+            <div class="indicator-label">EMA 21</div>
+          </div>
           <div class="indicator-value" id="ema21-${symbol}">--</div>
         </div>
         
         <div class="indicator">
-          <div class="indicator-label">EMA 50</div>
+          <div class="indicator-label-container">
+            <div class="dot neutral" id="dot3-${symbol}"></div>
+            <div class="indicator-label">EMA 50</div>
+          </div>
           <div class="indicator-value" id="ema50-${symbol}">--</div>
         </div>
         
@@ -940,10 +1072,17 @@
       if (data.analytics) {
         const analytics = data.analytics;
         
+        // Обновляем LONG и SHORT проценты
+        updateLongPercentage(symbol, analytics);
+        updateShortPercentage(symbol, analytics);
+        
         // EMA индикаторы
         updateIndicator(`ema9-${symbol}`, analytics.ema9, 'price');
         updateIndicator(`ema21-${symbol}`, analytics.ema21, 'price');
         updateIndicator(`ema50-${symbol}`, analytics.ema50, 'price');
+        
+        // Обновляем точки тренда
+        updateTrendDots(symbol, analytics.isUptrend, analytics.isDowntrend);
         
         // RSI
         updateIndicator(`rsi-${symbol}`, analytics.rsi, 'rsi');
@@ -973,6 +1112,59 @@
         updateIndicator(`spread-${symbol}`, data.orderBook.spreadPercent, 'spread');
         updateIndicator(`liquidity-${symbol}`, data.orderBook.totalLiquidity, 'liquidity');
         updateIndicator(`bid-ask-ratio-${symbol}`, data.orderBook.bidAskRatio, 'bid-ask-ratio');
+      }
+    }
+
+    function updateLongPercentage(symbol, analytics) {
+      const longPercentageEl = document.getElementById(`long-percentage-${symbol}`);
+      if (!longPercentageEl) return;
+
+      const percentage = analytics.longPercentage || 0;
+      longPercentageEl.textContent = `${percentage}%`;
+      
+      if (percentage > 0) {
+        longPercentageEl.classList.add('long-active');
+      } else {
+        longPercentageEl.classList.remove('long-active');
+      }
+    }
+
+    function updateShortPercentage(symbol, analytics) {
+      const shortPercentageEl = document.getElementById(`short-percentage-${symbol}`);
+      if (!shortPercentageEl) return;
+
+      const percentage = analytics.shortPercentage || 0;
+      shortPercentageEl.textContent = `${percentage}%`;
+      
+      if (percentage > 0) {
+        shortPercentageEl.classList.add('short-active');
+      } else {
+        shortPercentageEl.classList.remove('short-active');
+      }
+    }
+
+    function updateTrendDots(symbol, isUptrend, isDowntrend) {
+      const dot1 = document.getElementById(`dot1-${symbol}`);
+      const dot2 = document.getElementById(`dot2-${symbol}`);
+      const dot3 = document.getElementById(`dot3-${symbol}`);
+      
+      if (!dot1 || !dot2 || !dot3) return;
+
+      if (isUptrend) {
+        // Зеленые точки для восходящего тренда
+        dot1.className = 'dot green';
+        dot2.className = 'dot green';
+        dot3.className = 'dot green';
+      } else if (isDowntrend) {
+        // Красные точки для нисходящего тренда
+        dot1.className = 'dot red';
+        dot2.className = 'dot red';
+        dot3.className = 'dot red';
+      } else {
+        // Серые точки для нейтрального тренда
+        dot1.className = 'dot neutral';
+        dot2.className = 'dot neutral';
+        dot3.className = 'dot neutral';
       }
     }
 

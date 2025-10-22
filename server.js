@@ -233,14 +233,29 @@ class TechnicalIndicators {
     const currentPrice = priceArray[priceArray.length - 1];
     const priceArrayLength = priceArray.length;
     
+    const ema9 = priceArrayLength >= 3 ? this.calculateEMA(priceArray, Math.min(9, priceArrayLength)) : currentPrice;
+    const ema21 = priceArrayLength >= 3 ? this.calculateEMA(priceArray, Math.min(21, priceArrayLength)) : currentPrice;
+    const ema50 = priceArrayLength >= 3 ? this.calculateEMA(priceArray, Math.min(50, priceArrayLength)) : currentPrice;
+    
+    // Определяем тренд: EMA9 > EMA21 > EMA50 (восходящий) или EMA9 < EMA21 < EMA50 (нисходящий)
+    const isUptrend = ema9 > ema21 && ema21 > ema50;
+    const isDowntrend = ema9 < ema21 && ema21 < ema50;
+    const longPercentage = isUptrend ? 20 : 0;
+    const shortPercentage = isDowntrend ? 20 : 0;
+    
     return {
-      ema9: priceArrayLength >= 3 ? this.calculateEMA(priceArray, Math.min(9, priceArrayLength)) : currentPrice,
-      ema21: priceArrayLength >= 3 ? this.calculateEMA(priceArray, Math.min(21, priceArrayLength)) : currentPrice,
-      ema50: priceArrayLength >= 3 ? this.calculateEMA(priceArray, Math.min(50, priceArrayLength)) : currentPrice,
+      ema9: ema9,
+      ema21: ema21,
+      ema50: ema50,
       rsi: priceArrayLength >= 3 ? this.calculateRSI(priceArray, Math.min(14, priceArrayLength - 1)) : 50,
       macd: priceArrayLength >= 3 ? this.calculateMACD(priceArray) : { macd: 0, signal: 0, histogram: 0 },
       atr: priceArrayLength >= 3 ? this.calculateATR(priceArray, Math.min(14, priceArrayLength - 1)) : 0,
-      volumeRatio: volumeArray.length >= 3 ? this.calculateVolumeRatio(volumeArray) : 1
+      volumeRatio: volumeArray.length >= 3 ? this.calculateVolumeRatio(volumeArray) : 1,
+      // Новые поля для тренда
+      isUptrend: isUptrend,
+      isDowntrend: isDowntrend,
+      longPercentage: longPercentage,
+      shortPercentage: shortPercentage
     };
   }
 }
@@ -294,6 +309,7 @@ function connectToBinance() {
 
     // Обновляем историю для расчета индикаторов (15-минутный таймфрейм)
     indicators.updateHistory(ticker.s, price, volume, timestamp, '15m');
+
 
     console.log(`📊 ${ticker.s}: $${price}`);
 
