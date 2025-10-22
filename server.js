@@ -312,6 +312,20 @@ class TechnicalIndicators {
       const isUptrend = ema9 > ema21 && ema21 > ema50;
       const isDowntrend = ema9 < ema21 && ema21 < ema50;
       
+      // Дополнительная логика для EMA 9/21 (независимо от EMA 50)
+      let ema9_21Confidence = 0;
+      let ema9_21Signal = 'neutral'; // neutral, long, short
+      
+      if (ema9 > ema21) {
+        // EMA 9 > EMA 21 → зеленые EMA 9 и 21 + +10% к LONG
+        ema9_21Signal = 'long';
+        ema9_21Confidence = 10;
+      } else if (ema9 < ema21) {
+        // EMA 9 < EMA 21 → красные EMA 9 и 21 + +10% к SHORT
+        ema9_21Signal = 'short';
+        ema9_21Confidence = 10;
+      }
+      
       // Анализ Bid/Ask Ratio для определения силы покупателей и продавцов
       const orderBookData = cryptoOrderBook[symbol] || null;
       const bidAskRatio = orderBookData?.bidAskRatio || 1.0;
@@ -515,20 +529,32 @@ class TechnicalIndicators {
       const isRsiLongSignal = rsiSignal === 'long-weak' || rsiSignal === 'long-strong' || rsiSignal === 'long-extreme';
       const isRsiShortSignal = rsiSignal === 'short-weak' || rsiSignal === 'short-strong' || rsiSignal === 'short-extreme';
       
+      // Логика EMA: приоритет всем трем, иначе только 9/21
       if (isUptrend) {
+        // Все три EMA (9 > 21 > 50) → +20% к LONG
         longPercentage = 20 + (isLongSignal ? bidAskConfidence : 0);
       } else if (isDowntrend) {
+        // Все три EMA (9 < 21 < 50) → +20% к SHORT
         shortPercentage = 20 + (isShortSignal ? bidAskConfidence : 0);
         // НО Bid/Ask LONG сигнал все равно добавляет уверенность к LONG
         if (isLongSignal && bidAskConfidence > 0) {
           longPercentage = bidAskConfidence;
         }
       } else {
-        // Если EMA нейтральный, но есть Bid/Ask сигнал
-        if (isLongSignal && bidAskConfidence > 0) {
-          longPercentage = bidAskConfidence;
-        } else if (isShortSignal && bidAskConfidence > 0) {
-          shortPercentage = bidAskConfidence;
+        // EMA 50 нейтральная, проверяем только EMA 9/21
+        if (ema9_21Signal === 'long') {
+          // EMA 9 > EMA 21 → +10% к LONG
+          longPercentage = 10 + (isLongSignal ? bidAskConfidence : 0);
+        } else if (ema9_21Signal === 'short') {
+          // EMA 9 < EMA 21 → +10% к SHORT
+          shortPercentage = 10 + (isShortSignal ? bidAskConfidence : 0);
+        } else {
+          // Все EMA нейтральные, но есть Bid/Ask сигнал
+          if (isLongSignal && bidAskConfidence > 0) {
+            longPercentage = bidAskConfidence;
+          } else if (isShortSignal && bidAskConfidence > 0) {
+            shortPercentage = bidAskConfidence;
+          }
         }
       }
       
@@ -642,13 +668,21 @@ class TechnicalIndicators {
         // ATR в нормальном диапазоне
         // Определяем направление EMA
         if (isUptrend) {
-          // Все EMA зеленые → ATR зеленый
+          // Все 3 EMA зеленые (9>21>50) → ATR зеленый +15%
           atrSignal = 'long';
-          atrConfidence = 15; // +15% к LONG
+          atrConfidence = 15;
         } else if (isDowntrend) {
-          // Все EMA красные → ATR красный
+          // Все 3 EMA красные (9<21<50) → ATR красный +15%
           atrSignal = 'short';
-          atrConfidence = 15; // +15% к SHORT
+          atrConfidence = 15;
+        } else if (ema9_21Signal === 'long') {
+          // 2 EMA зеленые (9>21, 50 серая) → ATR зеленый +10%
+          atrSignal = 'long';
+          atrConfidence = 10;
+        } else if (ema9_21Signal === 'short') {
+          // 2 EMA красные (9<21, 50 серая) → ATR красный +10%
+          atrSignal = 'short';
+          atrConfidence = 10;
         } else {
           // EMA нейтральные → ATR серый
           atrSignal = 'neutral';
@@ -730,7 +764,10 @@ class TechnicalIndicators {
       atrSignal: atrSignal,
       // Spread анализ
       spreadConfidence: spreadConfidence,
-      spreadSignal: spreadSignal
+      spreadSignal: spreadSignal,
+      // EMA 9/21 анализ
+      ema9_21Confidence: ema9_21Confidence,
+      ema9_21Signal: ema9_21Signal
     };
   }
 }
@@ -786,7 +823,7 @@ function connectToBinance() {
     indicators.updateHistory(ticker.s, price, volume, timestamp, '15m');
 
 
-    console.log(`📊 ${ticker.s}: $${price}`);
+    // console.log(`📊 ${ticker.s}: $${price}`);
 
     // Отправляем обновленные данные всем клиентам
     sendAllPricesToClients();
@@ -826,7 +863,7 @@ function connectToFutures() {
       rawData: ticker.c
     };
 
-    console.log(`📈 ${ticker.s} Futures: $${cryptoFuturesPrices[ticker.s].price}`);
+    // console.log(`📈 ${ticker.s} Futures: $${cryptoFuturesPrices[ticker.s].price}`);
     
     // Отправляем обновленные данные всем клиентам
     sendAllPricesToClients();

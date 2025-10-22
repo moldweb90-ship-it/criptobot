@@ -629,25 +629,225 @@
     }
 
 
-    /* Торговые сигналы */
-    .signals-section {
-      margin-top: 30px;
-      width: 100%;
+
+    /* Секция сделок */
+    .deals-section {
+      margin-bottom: 40px;
       display: flex;
+      gap: 20px;
+      width: 100%;
+    }
+
+    /* Открытые сделки (слева) */
+    .open-deals-container {
+      flex: 1;
+      width: 50%;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .open-deals-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    .open-deals-content {
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #a0aec0;
+      font-size: 16px;
+    }
+
+    /* Подготовка сделки (справа) */
+    .deal-prep-container {
+      flex: 1;
+      width: 50%;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .deal-prep-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    .deal-prep-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 20px;
     }
 
-    .signals-container {
-      flex: 1;
-      width: 50%;
+    .deal-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .positions-container {
-      flex: 1;
-      width: 50%;
+    .deal-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
     }
 
-    .signals-title, .positions-title, .market-title {
+    .deal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+
+    .deal-symbol {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    .deal-match-count {
+      font-size: 16px;
+      font-weight: 600;
+      padding: 4px 8px;
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 6px;
+    }
+
+    .deal-action-row {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+
+    .deal-action {
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .deal-action.buy {
+      background: #48bb78;
+      color: white;
+    }
+
+    .deal-action.sell {
+      background: #f56565;
+      color: white;
+    }
+
+    .deal-timer {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 15px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .timer-label {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .timer-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: white;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 2px;
+    }
+
+    .deal-confidence {
+      margin-bottom: 15px;
+    }
+
+    .confidence-label {
+      font-size: 12px;
+      color: #718096;
+      margin-bottom: 5px;
+    }
+
+    .confidence-bar {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .confidence-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #48bb78, #68d391);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    .confidence-percent {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2d3748;
+      margin-top: 5px;
+    }
+
+    .deal-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f7fafc;
+    }
+
+    .metric:last-child {
+      border-bottom: none;
+    }
+
+    .metric-label {
+      font-size: 12px;
+      color: #718096;
+    }
+
+    .metric-value {
+      font-size: 12px;
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    .metric-value.positive {
+      color: #48bb78;
+    }
+
+    .metric-value.negative {
+      color: #f56565;
+    }
+
+    .metric-value.neutral {
+      color: #a0aec0;
+    }
+
+    .market-title {
       text-align: center;
       color: white;
       font-size: 24px;
@@ -689,152 +889,28 @@
       gap: 15px;
     }
 
-    .signal-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 12px;
-      padding: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    }
 
-    .signal-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #e2e8f0;
-    }
 
-    .signal-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: bold;
-    }
 
-    .signal-name {
-      font-size: 13px;
-      font-weight: 700;
-      color: #2d3748;
-    }
-
-    .signal-badge {
-      margin-left: auto;
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    .signal-badge.buy {
-      background: #48bb78;
-      color: white;
-    }
-
-    .signal-badge.sell {
-      background: #f56565;
-      color: white;
-    }
-
-    .signal-badge.hold {
-      background: #ecc94b;
-      color: #2d3748;
-    }
-
-    .confidence-bar {
-      margin: 10px 0;
-    }
-
-    .confidence-label {
-      font-size: 10px;
-      color: #718096;
-      margin-bottom: 4px;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .confidence-progress {
-      width: 100%;
-      height: 8px;
-      background: #e2e8f0;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
-    .confidence-fill {
-      height: 100%;
-      transition: width 0.5s ease, background 0.3s ease;
-      border-radius: 4px;
-    }
-
-    .confidence-fill.high {
-      background: linear-gradient(90deg, #48bb78, #38a169);
-    }
-
-    .confidence-fill.medium {
-      background: linear-gradient(90deg, #ecc94b, #d69e2e);
-    }
-
-    .confidence-fill.low {
-      background: linear-gradient(90deg, #cbd5e0, #a0aec0);
-    }
-
-    .signal-metrics {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 10px;
-    }
-
-    .signal-metric {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      padding: 4px 8px;
-      background: #f7fafc;
-      border-radius: 4px;
-    }
-
-    .signal-metric-label {
-      color: #718096;
-      font-weight: 500;
-    }
-
-    .signal-metric-value {
-      font-weight: 700;
-      color: #2d3748;
-    }
-
-    .signal-metric-value.green {
-      color: #38a169;
-    }
-
-    .signal-metric-value.red {
-      color: #e53e3e;
-    }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Секция торговых сигналов и позиций -->
-    <div class="signals-section">
-      <div class="signals-container">
-        <h2 class="signals-title">🎯 Торговые сигналы</h2>
-        <div class="signals-grid" id="signalsGrid">
-          <!-- Сигналы будут добавлены через JavaScript -->
+    <!-- Секция сделок -->
+    <div class="deals-section">
+      <!-- Открытые сделки (слева) -->
+      <div class="open-deals-container">
+        <h2 class="open-deals-title">Открытые сделки</h2>
+        <div class="open-deals-content">
+          <!-- Открытые сделки будут добавлены через JavaScript -->
         </div>
       </div>
-      
-      <div class="positions-container">
-        <h2 class="positions-title">📊 Открытые позиции</h2>
-        <div class="positions-content">
-          Позиции будут отображаться здесь
+
+      <!-- Подготовка сделки (справа) -->
+      <div class="deal-prep-container">
+        <h2 class="deal-prep-title">🎯 Подготовка сделки</h2>
+        <div class="deal-prep-grid" id="dealPrepGrid">
+          <!-- Подготовленные сделки будут добавлены через JavaScript -->
         </div>
       </div>
     </div>
@@ -860,8 +936,9 @@
     const ws = new WebSocket('ws://localhost:5000');
     const cryptoGrid = document.getElementById('cryptoGrid');
     const analyticsGrid = document.getElementById('analyticsGrid');
-    const signalsGrid = document.getElementById('signalsGrid');
+    const dealPrepGrid = document.getElementById('dealPrepGrid');
     const lastPrices = {};
+    const dealPrepData = {}; // Хранилище данных для подготовки сделок
     
     // Конфигурация криптовалют
     const cryptoConfig = {
@@ -883,9 +960,6 @@
       const analyticsCard = createAnalyticsCard(symbol, config);
       analyticsGrid.appendChild(analyticsCard);
 
-      // Создаем карточку торговых сигналов
-      const signalCard = createSignalCard(symbol, config);
-      signalsGrid.appendChild(signalCard);
     });
 
     function createCryptoCard(symbol, config) {
@@ -1052,50 +1126,6 @@
       return card;
     }
 
-    function createSignalCard(symbol, config) {
-      const card = document.createElement('div');
-      card.className = 'signal-card';
-      card.id = `signal-${symbol}`;
-      
-      card.innerHTML = `
-        <div class="signal-header">
-          <div class="signal-icon ${config.class}">${config.symbol}</div>
-          <div class="signal-name">${config.name}</div>
-          <div class="signal-badge hold" id="signal-badge-${symbol}">HOLD</div>
-        </div>
-        
-        <div class="confidence-bar">
-          <div class="confidence-label">
-            <span>Confidence</span>
-            <span id="confidence-value-${symbol}">0%</span>
-          </div>
-          <div class="confidence-progress">
-            <div class="confidence-fill low" id="confidence-fill-${symbol}" style="width: 0%"></div>
-          </div>
-        </div>
-        
-        <div class="signal-metrics">
-          <div class="signal-metric">
-            <span class="signal-metric-label">Entry</span>
-            <span class="signal-metric-value" id="entry-${symbol}">--</span>
-          </div>
-          <div class="signal-metric">
-            <span class="signal-metric-label">TP</span>
-            <span class="signal-metric-value green" id="tp-${symbol}">--</span>
-          </div>
-          <div class="signal-metric">
-            <span class="signal-metric-label">SL</span>
-            <span class="signal-metric-value red" id="sl-${symbol}">--</span>
-          </div>
-          <div class="signal-metric">
-            <span class="signal-metric-label">R:R</span>
-            <span class="signal-metric-value" id="rr-${symbol}">--</span>
-          </div>
-        </div>
-      `;
-      
-      return card;
-    }
 
     function updateCryptoCard(symbol, data) {
       const priceEl = document.getElementById(`price-${symbol}`);
@@ -1147,13 +1177,16 @@
         updateLongPercentage(symbol, analytics);
         updateShortPercentage(symbol, analytics);
         
+        // Обновляем модуль "Подготовка сделки"
+        updateDealPreparation(symbol, analytics);
+        
         // EMA индикаторы
         updateIndicator(`ema9-${symbol}`, analytics.ema9, 'price');
         updateIndicator(`ema21-${symbol}`, analytics.ema21, 'price');
         updateIndicator(`ema50-${symbol}`, analytics.ema50, 'price');
         
           // Обновляем точки тренда
-          updateTrendDots(symbol, analytics.isUptrend, analytics.isDowntrend);
+          updateTrendDots(symbol, analytics.isUptrend, analytics.isDowntrend, analytics.ema9_21Signal);
           
           // Обновляем Bid/Ask сигнал
           updateBidAskSignal(symbol, analytics);
@@ -1232,7 +1265,172 @@
       }
     }
 
-      function updateTrendDots(symbol, isUptrend, isDowntrend) {
+    function updateDealPreparation(symbol, analytics) {
+      const longPercentage = analytics.longPercentage || 0;
+      const shortPercentage = analytics.shortPercentage || 0;
+      const currentPrice = lastPrices[symbol] || 0;
+      
+      // Определяем направление сделки и процент уверенности
+      let dealDirection = null;
+      let confidence = 0;
+      let matchedIndicators = 0;
+      let totalActiveIndicators = 0;
+      
+      if (longPercentage >= 55) {
+        dealDirection = 'buy';
+        confidence = longPercentage;
+        // Считаем совпадающие индикаторы для LONG (только активные, не нейтральные)
+        if (analytics.ema9_21Signal === 'long') matchedIndicators++;
+        if (analytics.macdSignal === 'long') matchedIndicators++;
+        if (analytics.atrSignal === 'long') matchedIndicators++;
+        if (analytics.rsiSignal && analytics.rsiSignal.includes('long')) matchedIndicators++;
+        if (analytics.volumeSignal === 'long') matchedIndicators++;
+        if (analytics.liquiditySignal === 'long') matchedIndicators++;
+        if (analytics.bidAskSignal === 'long') matchedIndicators++;
+        if (analytics.spreadSignal === 'long') matchedIndicators++;
+        
+        // Подсчитываем общее количество активных индикаторов (не нейтральных)
+        if (analytics.ema9_21Signal !== 'neutral') totalActiveIndicators++;
+        if (analytics.macdSignal !== 'neutral') totalActiveIndicators++;
+        if (analytics.atrSignal !== 'neutral') totalActiveIndicators++;
+        if (analytics.rsiSignal && analytics.rsiSignal !== 'neutral') totalActiveIndicators++;
+        if (analytics.volumeSignal !== 'neutral') totalActiveIndicators++;
+        if (analytics.liquiditySignal !== 'neutral') totalActiveIndicators++;
+        if (analytics.bidAskSignal !== 'neutral') totalActiveIndicators++;
+        if (analytics.spreadSignal !== 'neutral') totalActiveIndicators++;
+      } else if (shortPercentage >= 55) {
+        dealDirection = 'sell';
+        confidence = shortPercentage;
+        // Считаем совпадающие индикаторы для SHORT (только активные, не нейтральные)
+        if (analytics.ema9_21Signal === 'short') matchedIndicators++;
+        if (analytics.macdSignal === 'short') matchedIndicators++;
+        if (analytics.atrSignal === 'short') matchedIndicators++;
+        if (analytics.rsiSignal && analytics.rsiSignal.includes('short')) matchedIndicators++;
+        if (analytics.volumeSignal === 'short') matchedIndicators++;
+        if (analytics.liquiditySignal === 'short') matchedIndicators++;
+        if (analytics.bidAskSignal === 'short') matchedIndicators++;
+        if (analytics.spreadSignal === 'short') matchedIndicators++;
+        
+        // Подсчитываем общее количество активных индикаторов (не нейтральных)
+        if (analytics.ema9_21Signal !== 'neutral') totalActiveIndicators++;
+        if (analytics.macdSignal !== 'neutral') totalActiveIndicators++;
+        if (analytics.atrSignal !== 'neutral') totalActiveIndicators++;
+        if (analytics.rsiSignal && analytics.rsiSignal !== 'neutral') totalActiveIndicators++;
+        if (analytics.volumeSignal !== 'neutral') totalActiveIndicators++;
+        if (analytics.liquiditySignal !== 'neutral') totalActiveIndicators++;
+        if (analytics.bidAskSignal !== 'neutral') totalActiveIndicators++;
+        if (analytics.spreadSignal !== 'neutral') totalActiveIndicators++;
+      }
+      
+      // Если есть направление сделки
+      if (dealDirection) {
+        // Если это новая сделка, инициализируем таймер
+        if (!dealPrepData[symbol]) {
+          dealPrepData[symbol] = {
+            direction: dealDirection,
+            confidence: confidence,
+            price: currentPrice,
+            timestamp: Date.now(),
+            timerSeconds: 120, // 2 минуты = 120 секунд
+            matchedIndicators: matchedIndicators,
+            totalActiveIndicators: totalActiveIndicators
+          };
+        } else {
+          // Обновляем уверенность, цену и совпадения
+          dealPrepData[symbol].confidence = confidence;
+          dealPrepData[symbol].price = currentPrice;
+          dealPrepData[symbol].matchedIndicators = matchedIndicators;
+          dealPrepData[symbol].totalActiveIndicators = totalActiveIndicators;
+        }
+        
+        // Создаем или обновляем карточку
+        createOrUpdateDealCard(symbol, dealPrepData[symbol]);
+      } else {
+        // Проверяем, нужно ли удалить карточку (если уверенность упала ниже 50%)
+        if (dealPrepData[symbol]) {
+          const existingDirection = dealPrepData[symbol].direction;
+          const currentConfidence = existingDirection === 'buy' ? longPercentage : shortPercentage;
+          if (currentConfidence < 50) {
+            removeDealCard(symbol);
+            delete dealPrepData[symbol];
+          }
+        }
+      }
+    }
+
+    function createOrUpdateDealCard(symbol, dealData) {
+      const config = cryptoConfig[symbol];
+      if (!config) return;
+      
+      let card = document.getElementById(`deal-card-${symbol}`);
+      
+      if (!card) {
+        // Создаем новую карточку
+        card = document.createElement('div');
+        card.className = 'deal-card';
+        card.id = `deal-card-${symbol}`;
+        dealPrepGrid.appendChild(card);
+      }
+      
+      // Рассчитываем TP и SL
+      const entryPrice = dealData.price;
+      const tpPrice = dealData.direction === 'buy' ? 
+        (entryPrice * 1.0025).toFixed(4) : 
+        (entryPrice * 0.9975).toFixed(4);
+      const slPrice = dealData.direction === 'buy' ? 
+        (entryPrice * 0.9987).toFixed(4) : 
+        (entryPrice * 1.0013).toFixed(4);
+      
+      const tpPercent = dealData.direction === 'buy' ? '+0.25%' : '-0.25%';
+      const slPercent = dealData.direction === 'buy' ? '-0.13%' : '+0.13%';
+      
+      // Инициализируем таймер для отображения
+      const timerSeconds = dealData.timerSeconds || 120;
+      const minutes = Math.floor(timerSeconds / 60);
+      const seconds = timerSeconds % 60;
+      const timerDisplay = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      
+      // Определяем цвет счетчика совпадений
+      const matchedCount = dealData.matchedIndicators || 0;
+      const totalActive = dealData.totalActiveIndicators || 8;
+      let matchColor = '#ef4444'; // красный по умолчанию (0-3)
+      if (matchedCount >= 6) {
+        matchColor = '#10b981'; // зеленый (6+)
+      } else if (matchedCount >= 4) {
+        matchColor = '#f59e0b'; // оранжевый (4-5)
+      }
+      
+      card.innerHTML = `
+        <div class="deal-header">
+          <div class="deal-symbol">${config.symbol} ${config.name}</div>
+          <div class="deal-action ${dealData.direction}">${dealData.direction === 'buy' ? 'BUY' : 'SELL'}</div>
+          <div class="deal-match-count" style="color: ${matchColor}; font-weight: 600;">${matchedCount}/${totalActive}</div>
+        </div>
+        
+        <div class="deal-timer" id="timer-${symbol}">
+          <div class="timer-label">⏱️ Подтверждение</div>
+          <div class="timer-value" id="timer-value-${symbol}">${timerDisplay}</div>
+        </div>
+
+        <div class="deal-confidence">
+          <div class="confidence-label">Уверенность</div>
+          <div class="confidence-bar">
+            <div class="confidence-fill" style="width: ${dealData.confidence}%"></div>
+          </div>
+          <div class="confidence-percent">${dealData.confidence}%</div>
+        </div>
+        
+      `;
+    }
+
+    function removeDealCard(symbol) {
+      const card = document.getElementById(`deal-card-${symbol}`);
+      if (card) {
+        card.remove();
+      }
+    }
+
+      function updateTrendDots(symbol, isUptrend, isDowntrend, ema9_21Signal) {
         const dot1 = document.getElementById(`dot1-${symbol}`);
         const dot2 = document.getElementById(`dot2-${symbol}`);
         const dot3 = document.getElementById(`dot3-${symbol}`);
@@ -1240,20 +1438,33 @@
         if (!dot1 || !dot2 || !dot3) return;
       
         if (isUptrend) {
-          // Зеленые точки для восходящего тренда
+          // Зеленые точки для восходящего тренда (все три EMA)
           dot1.className = 'dot green';
           dot2.className = 'dot green';
           dot3.className = 'dot green';
         } else if (isDowntrend) {
-          // Красные точки для нисходящего тренда
+          // Красные точки для нисходящего тренда (все три EMA)
           dot1.className = 'dot red';
           dot2.className = 'dot red';
           dot3.className = 'dot red';
         } else {
-          // Серые точки для нейтрального тренда
-          dot1.className = 'dot neutral';
-          dot2.className = 'dot neutral';
-          dot3.className = 'dot neutral';
+          // EMA 50 нейтральная, но проверяем EMA 9/21
+          if (ema9_21Signal === 'long') {
+            // EMA 9 > EMA 21 → зеленые EMA 9 и 21, серая EMA 50
+            dot1.className = 'dot green';
+            dot2.className = 'dot green';
+            dot3.className = 'dot neutral';
+          } else if (ema9_21Signal === 'short') {
+            // EMA 9 < EMA 21 → красные EMA 9 и 21, серая EMA 50
+            dot1.className = 'dot red';
+            dot2.className = 'dot red';
+            dot3.className = 'dot neutral';
+          } else {
+            // Все серые
+            dot1.className = 'dot neutral';
+            dot2.className = 'dot neutral';
+            dot3.className = 'dot neutral';
+          }
         }
       }
 
@@ -1805,6 +2016,43 @@
     ws.onopen = () => {
       console.log('✅ Подключено к серверу');
     };
+
+    // Функция обновления таймеров
+    function updateTimers() {
+      Object.keys(dealPrepData).forEach(symbol => {
+        const deal = dealPrepData[symbol];
+        if (deal && deal.timerSeconds !== undefined && deal.timerSeconds > 0) {
+          deal.timerSeconds--;
+          
+          // Обновляем отображение таймера
+          const timerValueEl = document.getElementById(`timer-value-${symbol}`);
+          if (timerValueEl) {
+            const minutes = Math.floor(deal.timerSeconds / 60);
+            const seconds = deal.timerSeconds % 60;
+            timerValueEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            // Меняем цвет при малом времени
+            const timerEl = document.getElementById(`timer-${symbol}`);
+            if (timerEl) {
+              if (deal.timerSeconds <= 30) {
+                timerEl.style.background = 'linear-gradient(135deg, #fc8181, #f56565)';
+              } else if (deal.timerSeconds <= 60) {
+                timerEl.style.background = 'linear-gradient(135deg, #f6ad55, #ed8936)';
+              }
+            }
+          }
+          
+          // Когда таймер истек
+          if (deal.timerSeconds === 0) {
+            console.log(`⏰ Время вышло для ${symbol}. Можно входить в сделку!`);
+            // Здесь можно добавить логику автоматического входа в сделку
+          }
+        }
+      });
+    }
+
+    // Запускаем обновление таймеров каждую секунду
+    setInterval(updateTimers, 1000);
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
