@@ -30,6 +30,20 @@ let cryptoOrderBook = {};
 // EWMA фильтры для Bid/Ask Ratio (α = 0.3)
 let bidAskRatioFilters = {};
 
+// Хранилище предыдущих значений Bid/Ask Ratio для обнаружения резких скачков
+let previousBidAskRatio = {};
+
+// Хранилище времени последней волатильности для каждой монеты
+let volatilityTimers = {};
+
+// Хранилище времени входа в диапазон для подтверждения сигналов
+let rangeEntryTime = {
+  long: {},   // { BTCUSDT: 1234567890, ... }
+  short: {}
+};
+
+const CONFIRMATION_TIME = 20000; // 20 секунд в миллисекундах
+
 // Функция для расчета EWMA (Exponentially Weighted Moving Average)
 function calculateEWMA(currentValue, previousValue, alpha = 0.3) {
   if (previousValue === undefined || previousValue === null) {
@@ -205,13 +219,36 @@ class TechnicalIndicators {
   calculateVolumeRatio(volumes) {
     if (volumes.length < 20) return null;
     
-    const recent = volumes.slice(-5);
-    const older = volumes.slice(-20, -5);
+    // Извлекаем объемы из объектов { volume, timestamp }
+    const volumeValues = volumes.map(v => v.volume || v);
+    
+    // Берем последние 20 значений
+    const last20 = volumeValues.slice(-20);
+    
+    // Вычисляем медиану для определения порога аномалий
+    const sorted = [...last20].sort((a, b) => a - b);
+    const median = sorted[Math.floor(sorted.length / 2)];
+    
+    // Фильтруем аномальные объемы (больше 3x медианы)
+    const threshold = median * 3;
+    const filteredVolumes = last20.filter(v => v <= threshold);
+    
+    // Если после фильтрации осталось меньше 10 значений - данных недостаточно
+    if (filteredVolumes.length < 10) return null;
+    
+    // Делим на две группы: последние 5 и предыдущие
+    const recentCount = Math.min(5, Math.floor(filteredVolumes.length / 4));
+    const recent = filteredVolumes.slice(-recentCount);
+    const older = filteredVolumes.slice(-filteredVolumes.length, -recentCount);
+    
+    if (older.length === 0) return null;
     
     const avgRecent = recent.reduce((a, b) => a + b, 0) / recent.length;
     const avgOlder = older.reduce((a, b) => a + b, 0) / older.length;
     
-    return avgRecent / avgOlder;
+    const ratio = avgRecent / avgOlder;
+    
+    return ratio;
   }
 
   getAnalytics(symbol) {
@@ -237,11 +274,193 @@ class TechnicalIndicators {
     const ema21 = priceArrayLength >= 3 ? this.calculateEMA(priceArray, Math.min(21, priceArrayLength)) : currentPrice;
     const ema50 = priceArrayLength >= 3 ? this.calculateEMA(priceArray, Math.min(50, priceArrayLength)) : currentPrice;
     
-    // Определяем тренд: EMA9 > EMA21 > EMA50 (восходящий) или EMA9 < EMA21 < EMA50 (нисходящий)
-    const isUptrend = ema9 > ema21 && ema21 > ema50;
-    const isDowntrend = ema9 < ema21 && ema21 < ema50;
-    const longPercentage = isUptrend ? 20 : 0;
-    const shortPercentage = isDowntrend ? 20 : 0;
+      // Определяем тренд: EMA9 > EMA21 > EMA50 (восходящий) или EMA9 < EMA21 < EMA50 (нисходящий)
+      const isUptrend = ema9 > ema21 && ema21 > ema50;
+      const isDowntrend = ema9 < ema21 && ema21 < ema50;
+      
+      // Анализ Bid/Ask Ratio для определения силы покупателей и продавцов
+      const orderBookData = cryptoOrderBook[symbol] || null;
+      const bidAskRatio = orderBookData?.bidAskRatio || 1.0;
+      let bidAskConfidence = 0;
+      let bidAskSignal = 'neutral'; // neutral, weak, good, strong, short-weak, short-strong, short-aggressive, volatile
+      
+      // Проверка на резкие скачки Bid/Ask Ratio
+      const prevRatio = previousBidAskRatio[symbol] || bidAskRatio;
+      const ratioChange = Math.abs(bidAskRatio - prevRatio);
+      const currentTime = Date.now();
+
+      // Сохраняем текущее значение для следующей проверки
+      previousBidAskRatio[symbol] = bidAskRatio;
+
+      // Проверяем, есть ли активный таймер волатильности
+      const lastVolatilityTime = volatilityTimers[symbol] || 0;
+      const timeSinceVolatility = currentTime - lastVolatilityTime;
+      const isVolatilityActive = timeSinceVolatility < 10000; // 10 секунд
+
+      // Жёсткие пороги для однозначных сигналов
+      // Если изменение > 1.0 - это волатильность (спуфинг), игнорируем
+      if (ratioChange > 1.0) {
+        bidAskSignal = 'volatile';
+        bidAskConfidence = 0;
+        // Запускаем таймер волатильности на 10 секунд
+        volatilityTimers[symbol] = currentTime;
+        // Сбрасываем таймеры подтверждения
+        rangeEntryTime.long[symbol] = null;
+        rangeEntryTime.short[symbol] = null;
+      } else if (isVolatilityActive) {
+        // Если таймер волатильности еще активен, показываем крестик
+        bidAskSignal = 'volatile';
+        bidAskConfidence = 0;
+        // Сбрасываем таймеры подтверждения
+        rangeEntryTime.long[symbol] = null;
+        rangeEntryTime.short[symbol] = null;
+      } else if (ratioChange <= 0.8) {
+        // Стабильные значения - проверяем диапазоны с подтверждением 20 секунд
+        
+        // Проверяем LONG диапазон (2.0x - 5.0x)
+        if (bidAskRatio >= 2.0 && bidAskRatio <= 5.0) {
+          if (!rangeEntryTime.long[symbol]) {
+            rangeEntryTime.long[symbol] = currentTime; // Первый вход в диапазон
+          }
+          
+          const timeInLongRange = currentTime - rangeEntryTime.long[symbol];
+          
+          if (timeInLongRange >= CONFIRMATION_TIME) {
+            // Подтверждено 20 секунд в диапазоне
+            bidAskConfidence = 20;
+            bidAskSignal = 'long';
+          }
+          
+          // Сбрасываем SHORT таймер
+          rangeEntryTime.short[symbol] = null;
+          
+        } else if (bidAskRatio >= 0.10 && bidAskRatio <= 0.90) {
+          // Проверяем SHORT диапазон (0.10x - 0.90x)
+          if (!rangeEntryTime.short[symbol]) {
+            rangeEntryTime.short[symbol] = currentTime; // Первый вход в диапазон
+          }
+          
+          const timeInShortRange = currentTime - rangeEntryTime.short[symbol];
+          
+          if (timeInShortRange >= CONFIRMATION_TIME) {
+            // Подтверждено 20 секунд в диапазоне
+            bidAskConfidence = 20;
+            bidAskSignal = 'short';
+          }
+          
+          // Сбрасываем LONG таймер
+          rangeEntryTime.long[symbol] = null;
+          
+        } else {
+          // Вне диапазонов - сбрасываем оба таймера
+          rangeEntryTime.long[symbol] = null;
+          rangeEntryTime.short[symbol] = null;
+        }
+      } else {
+        // Изменение > 0.8 и ≤ 1.0 - неопределенность, сбрасываем таймеры
+        rangeEntryTime.long[symbol] = null;
+        rangeEntryTime.short[symbol] = null;
+      }
+      
+      // Отладочная информация для BTCUSDT
+      if (symbol === 'BTCUSDT') {
+        const volumeRatio = volumeArray.length >= 20 ? this.calculateVolumeRatio(volumeArray) : null;
+        const volumeValues = volumeArray.map(v => v.volume || v);
+        const last20 = volumeValues.slice(-20);
+        const sorted = [...last20].sort((a, b) => a - b);
+        const median = sorted[Math.floor(sorted.length / 2)];
+        const threshold = median * 3;
+        const filtered = last20.filter(v => v <= threshold);
+        const anomalies = last20.filter(v => v > threshold);
+        
+        console.log(`🔍 ${symbol} Volume Ratio Analysis:`, {
+          volumeHistoryLength: volumeArray.length,
+          volumeRatio: volumeRatio ? volumeRatio.toFixed(2) : 'null',
+          median: median.toFixed(0),
+          threshold: threshold.toFixed(0),
+          anomaliesDetected: anomalies.length,
+          anomalyValues: anomalies.map(v => v.toFixed(0)),
+          filteredCount: filtered.length,
+          recentVolumes: volumeValues.slice(-5).map(v => v.toFixed(0))
+        });
+      }
+      
+      // Анализ Volume Ratio для определения силы тренда
+      const volumeRatio = volumeArray.length >= 20 ? this.calculateVolumeRatio(volumeArray) : null;
+      let volumeConfidence = 0;
+      let volumeSignal = 'neutral'; // neutral, long-weak, long-strong, short-weak, short-strong, caution, anomaly, critical
+      
+      if (volumeRatio !== null) {
+        if (volumeRatio >= 20.0) {
+          // Критическая аномалия
+          volumeSignal = 'critical';
+          volumeConfidence = 0;
+        } else if (volumeRatio > 19.99) {
+          // Аномалия (красный крестик)
+          volumeSignal = 'anomaly';
+          volumeConfidence = 0;
+        } else if (volumeRatio >= 3.0 && volumeRatio <= 19.99) {
+          // Желтый кружок - осторожность
+          volumeSignal = 'caution';
+          volumeConfidence = 0;
+        } else if (volumeRatio >= 2.0 && volumeRatio < 3.0) {
+          // Сильный рост объема → +20% к LONG
+          volumeSignal = 'long-strong';
+          volumeConfidence = 20;
+        } else if (volumeRatio >= 1.5 && volumeRatio < 2.0) {
+          // Объем растет → +10% к LONG
+          volumeSignal = 'long-weak';
+          volumeConfidence = 10;
+        } else if (volumeRatio < 0.5) {
+          // Сильное падение объема → +20% к SHORT
+          volumeSignal = 'short-strong';
+          volumeConfidence = 20;
+        } else if (volumeRatio < 0.7) {
+          // Объем падает → +10% к SHORT
+          volumeSignal = 'short-weak';
+          volumeConfidence = 10;
+        } else {
+          // Стабильный объем (0.7 - 1.5)
+          volumeSignal = 'neutral';
+          volumeConfidence = 0;
+        }
+      }
+      
+      // Комбинируем EMA тренд с Bid/Ask анализом и Volume Ratio
+      let longPercentage = 0;
+      let shortPercentage = 0;
+      
+      // Определяем тип Bid/Ask сигнала
+      const isLongSignal = bidAskSignal === 'long';
+      const isShortSignal = bidAskSignal === 'short';
+      
+      // Определяем тип Volume сигнала
+      const isVolumeLongSignal = volumeSignal === 'long-weak' || volumeSignal === 'long-strong';
+      const isVolumeShortSignal = volumeSignal === 'short-weak' || volumeSignal === 'short-strong';
+      
+      if (isUptrend) {
+        longPercentage = 20 + (isLongSignal ? bidAskConfidence : 0) + (isVolumeLongSignal ? volumeConfidence : 0);
+      } else if (isDowntrend) {
+        shortPercentage = 20 + (isShortSignal ? bidAskConfidence : 0) + (isVolumeShortSignal ? volumeConfidence : 0);
+        // НО Bid/Ask LONG сигнал все равно добавляет уверенность к LONG
+        if (isLongSignal && bidAskConfidence > 0) {
+          longPercentage = bidAskConfidence + (isVolumeLongSignal ? volumeConfidence : 0);
+        }
+      } else {
+        // Если EMA нейтральный, но есть Bid/Ask или Volume сигнал
+        if (isLongSignal && bidAskConfidence > 0) {
+          longPercentage = bidAskConfidence + (isVolumeLongSignal ? volumeConfidence : 0);
+        } else if (isShortSignal && bidAskConfidence > 0) {
+          shortPercentage = bidAskConfidence + (isVolumeShortSignal ? volumeConfidence : 0);
+        } else {
+          // Только Volume сигнал
+          if (isVolumeLongSignal) {
+            longPercentage = volumeConfidence;
+          } else if (isVolumeShortSignal) {
+            shortPercentage = volumeConfidence;
+          }
+        }
+      }
     
     return {
       ema9: ema9,
@@ -250,12 +469,19 @@ class TechnicalIndicators {
       rsi: priceArrayLength >= 3 ? this.calculateRSI(priceArray, Math.min(14, priceArrayLength - 1)) : 50,
       macd: priceArrayLength >= 3 ? this.calculateMACD(priceArray) : { macd: 0, signal: 0, histogram: 0 },
       atr: priceArrayLength >= 3 ? this.calculateATR(priceArray, Math.min(14, priceArrayLength - 1)) : 0,
-      volumeRatio: volumeArray.length >= 3 ? this.calculateVolumeRatio(volumeArray) : 1,
+      volumeRatio: volumeRatio,
       // Новые поля для тренда
       isUptrend: isUptrend,
       isDowntrend: isDowntrend,
       longPercentage: longPercentage,
-      shortPercentage: shortPercentage
+      shortPercentage: shortPercentage,
+      // Bid/Ask анализ
+      bidAskRatio: bidAskRatio,
+      bidAskConfidence: bidAskConfidence,
+      bidAskSignal: bidAskSignal,
+      // Volume анализ
+      volumeConfidence: volumeConfidence,
+      volumeSignal: volumeSignal
     };
   }
 }
@@ -457,7 +683,8 @@ function connectToDepth() {
       top5BidVolume: top5BidVolumeUSD,
       top5AskVolume: top5AskVolumeUSD,
       top5Liquidity: top5BidVolumeUSD + top5AskVolumeUSD,
-      bidAskRatio: clampedRatio,
+      bidAskRatio: rawBidAskRatio, // Используем сырое значение для анализа
+      bidAskRatioFiltered: clampedRatio, // Отфильтрованное значение для отображения
       rawBidAskRatio: rawBidAskRatio, // Сохраняем сырое значение для отладки
       timestamp: new Date().toISOString()
     };

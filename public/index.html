@@ -471,6 +471,56 @@
       background: #e2e8f0;
     }
 
+    .dot.yellow {
+      background: #f6e05e;
+    }
+
+    .dot.blue {
+      background: #4299e1;
+    }
+
+    .dot.orange {
+      background: #ed8936;
+    }
+
+    .dot.red {
+      background: #f56565;
+    }
+
+    .dot.maroon {
+      background: #c53030;
+    }
+
+    .dot.volatile {
+      background: #e53e3e;
+      color: white;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #c53030;
+    }
+
+    .dot.caution {
+      background: #f6e05e;
+    }
+
+    .dot.anomaly {
+      background: #e53e3e;
+      color: white;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #c53030;
+    }
+
     .indicator-value-container {
       display: flex;
       align-items: center;
@@ -958,7 +1008,10 @@
         </div>
         
         <div class="indicator">
-          <div class="indicator-label">Volume Ratio</div>
+          <div class="indicator-label-container">
+            <div class="dot neutral" id="volume-dot-${symbol}"></div>
+            <div class="indicator-label">Volume Ratio</div>
+          </div>
           <div class="indicator-value" id="volume-ratio-${symbol}">--</div>
         </div>
         
@@ -973,7 +1026,10 @@
         </div>
         
         <div class="indicator">
-          <div class="indicator-label">Bid/Ask Ratio</div>
+          <div class="indicator-label-container">
+            <div class="dot neutral" id="bid-ask-dot-${symbol}"></div>
+            <div class="indicator-label">Bid/Ask Ratio</div>
+          </div>
           <div class="indicator-value" id="bid-ask-ratio-${symbol}">--</div>
         </div>
       `;
@@ -1081,8 +1137,14 @@
         updateIndicator(`ema21-${symbol}`, analytics.ema21, 'price');
         updateIndicator(`ema50-${symbol}`, analytics.ema50, 'price');
         
-        // Обновляем точки тренда
-        updateTrendDots(symbol, analytics.isUptrend, analytics.isDowntrend);
+          // Обновляем точки тренда
+          updateTrendDots(symbol, analytics.isUptrend, analytics.isDowntrend);
+          
+          // Обновляем Bid/Ask сигнал
+          updateBidAskSignal(symbol, analytics);
+          
+          // Обновляем Volume сигнал
+          updateVolumeSignal(symbol, analytics);
         
         // RSI
         updateIndicator(`rsi-${symbol}`, analytics.rsi, 'rsi');
@@ -1143,30 +1205,140 @@
       }
     }
 
-    function updateTrendDots(symbol, isUptrend, isDowntrend) {
-      const dot1 = document.getElementById(`dot1-${symbol}`);
-      const dot2 = document.getElementById(`dot2-${symbol}`);
-      const dot3 = document.getElementById(`dot3-${symbol}`);
+      function updateTrendDots(symbol, isUptrend, isDowntrend) {
+        const dot1 = document.getElementById(`dot1-${symbol}`);
+        const dot2 = document.getElementById(`dot2-${symbol}`);
+        const dot3 = document.getElementById(`dot3-${symbol}`);
+        
+        if (!dot1 || !dot2 || !dot3) return;
       
-      if (!dot1 || !dot2 || !dot3) return;
-
-      if (isUptrend) {
-        // Зеленые точки для восходящего тренда
-        dot1.className = 'dot green';
-        dot2.className = 'dot green';
-        dot3.className = 'dot green';
-      } else if (isDowntrend) {
-        // Красные точки для нисходящего тренда
-        dot1.className = 'dot red';
-        dot2.className = 'dot red';
-        dot3.className = 'dot red';
-      } else {
-        // Серые точки для нейтрального тренда
-        dot1.className = 'dot neutral';
-        dot2.className = 'dot neutral';
-        dot3.className = 'dot neutral';
+        if (isUptrend) {
+          // Зеленые точки для восходящего тренда
+          dot1.className = 'dot green';
+          dot2.className = 'dot green';
+          dot3.className = 'dot green';
+        } else if (isDowntrend) {
+          // Красные точки для нисходящего тренда
+          dot1.className = 'dot red';
+          dot2.className = 'dot red';
+          dot3.className = 'dot red';
+        } else {
+          // Серые точки для нейтрального тренда
+          dot1.className = 'dot neutral';
+          dot2.className = 'dot neutral';
+          dot3.className = 'dot neutral';
+        }
       }
-    }
+
+      function updateBidAskSignal(symbol, analytics) {
+        const bidAskDot = document.getElementById(`bid-ask-dot-${symbol}`);
+        if (!bidAskDot) return;
+      
+        const signal = analytics.bidAskSignal || 'neutral';
+        const ratio = analytics.bidAskRatio || 1.0;
+        
+        // Обновляем цвет кружка в зависимости от силы сигнала
+        switch (signal) {
+          case 'long':
+            // Зелёный кружок - устойчивое доминирование покупателей (2.0x-5.0x)
+            bidAskDot.className = 'dot green';
+            bidAskDot.innerHTML = '';
+            break;
+          case 'short':
+            // Красный кружок - явный перекос в сторону продавцов (0.10x-0.90x)
+            bidAskDot.className = 'dot red';
+            bidAskDot.innerHTML = '';
+            break;
+          case 'volatile':
+            // Волатильность - красный крестик (резкий скачок > 1.0)
+            bidAskDot.className = 'dot volatile';
+            bidAskDot.innerHTML = '✕';
+            break;
+          default:
+            // Серый кружок - нет сильного дисбаланса
+            bidAskDot.className = 'dot neutral';
+            bidAskDot.innerHTML = '';
+        }
+        
+        // Обновляем значение Bid/Ask Ratio с дополнительной информацией
+        const bidAskElement = document.getElementById(`bid-ask-ratio-${symbol}`);
+        if (bidAskElement) {
+          let displayText = `${ratio.toFixed(2)}x`;
+          if (analytics.bidAskConfidence > 0) {
+            displayText += ` (+${analytics.bidAskConfidence}%)`;
+          }
+          bidAskElement.textContent = displayText;
+        }
+      }
+
+      function updateVolumeSignal(symbol, analytics) {
+        const volumeDot = document.getElementById(`volume-dot-${symbol}`);
+        if (!volumeDot) return;
+      
+        const signal = analytics.volumeSignal || 'neutral';
+        const ratio = analytics.volumeRatio;
+        
+        // Обновляем цвет кружка в зависимости от силы сигнала
+        switch (signal) {
+          case 'long-weak':
+            // Зелёный кружок - объем растет (1.5-1.99)
+            volumeDot.className = 'dot green';
+            volumeDot.innerHTML = '';
+            break;
+          case 'long-strong':
+            // Зелёный кружок - сильный рост объема (2.0-2.99)
+            volumeDot.className = 'dot green';
+            volumeDot.innerHTML = '';
+            break;
+          case 'short-weak':
+            // Красный кружок - объем падает (< 0.7)
+            volumeDot.className = 'dot red';
+            volumeDot.innerHTML = '';
+            break;
+          case 'short-strong':
+            // Красный кружок - сильное падение объема (< 0.5)
+            volumeDot.className = 'dot red';
+            volumeDot.innerHTML = '';
+            break;
+          case 'caution':
+            // Желтый кружок - осторожность (3.0-19.99)
+            volumeDot.className = 'dot caution';
+            volumeDot.innerHTML = '';
+            break;
+          case 'anomaly':
+            // Красный крестик - аномалия (> 19.99)
+            volumeDot.className = 'dot anomaly';
+            volumeDot.innerHTML = '✕';
+            break;
+          case 'critical':
+            // Красный крестик с надписью АНОМАЛИЯ (≥ 20.0)
+            volumeDot.className = 'dot anomaly';
+            volumeDot.innerHTML = '✕';
+            break;
+          default:
+            // Серый кружок - стабильный объем (0.7-1.5)
+            volumeDot.className = 'dot neutral';
+            volumeDot.innerHTML = '';
+        }
+        
+        // Обновляем значение Volume Ratio
+        const volumeElement = document.getElementById(`volume-ratio-${symbol}`);
+        if (volumeElement) {
+          if (ratio !== null) {
+            let displayText = ratio.toFixed(2);
+            
+            if (signal === 'critical') {
+              displayText = 'АНОМАЛИЯ';
+            } else if (analytics.volumeConfidence > 0) {
+              displayText += ` (+${analytics.volumeConfidence}%)`;
+            }
+            
+            volumeElement.textContent = displayText;
+          } else {
+            volumeElement.textContent = '--';
+          }
+        }
+      }
 
     function updateIndicator(elementId, value, type) {
       const element = document.getElementById(elementId);
