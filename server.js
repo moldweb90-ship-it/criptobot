@@ -426,7 +426,46 @@ class TechnicalIndicators {
         }
       }
       
-      // Комбинируем EMA тренд с Bid/Ask анализом и Volume Ratio
+      // Анализ RSI для определения зон перекупленности/перепроданности
+      const rsi = priceArrayLength >= 3 ? this.calculateRSI(priceArray, Math.min(14, priceArrayLength - 1)) : 50;
+      let rsiConfidence = 0;
+      let rsiSignal = 'neutral'; // neutral, long-weak, long-strong, long-extreme, short-weak, short-strong, short-extreme
+      
+      if (rsi >= 15 && rsi < 30) {
+        // Экстремальная перепроданность → +30% к LONG
+        rsiSignal = 'long-extreme';
+        rsiConfidence = 30;
+      } else if (rsi >= 30 && rsi < 40) {
+        // Сильная перепроданность → +20% к LONG
+        rsiSignal = 'long-strong';
+        rsiConfidence = 20;
+      } else if (rsi >= 40 && rsi < 50) {
+        // Умеренная перепроданность → +10% к LONG
+        rsiSignal = 'long-weak';
+        rsiConfidence = 10;
+      } else if (rsi >= 50 && rsi < 60) {
+        // Нейтральная зона
+        rsiSignal = 'neutral';
+        rsiConfidence = 0;
+      } else if (rsi >= 60 && rsi < 70) {
+        // Умеренная перекупленность → +10% к SHORT
+        rsiSignal = 'short-weak';
+        rsiConfidence = 10;
+      } else if (rsi >= 70 && rsi <= 80) {
+        // Сильная перекупленность → +20% к SHORT
+        rsiSignal = 'short-strong';
+        rsiConfidence = 20;
+      } else if (rsi > 80 && rsi <= 100) {
+        // Экстремальная перекупленность → +30% к SHORT
+        rsiSignal = 'short-extreme';
+        rsiConfidence = 30;
+      } else {
+        // Нейтрально (< 15 и остальное)
+        rsiSignal = 'neutral';
+        rsiConfidence = 0;
+      }
+      
+      // Комбинируем EMA тренд с Bid/Ask анализом, Volume Ratio и RSI
       let longPercentage = 0;
       let shortPercentage = 0;
       
@@ -438,35 +477,40 @@ class TechnicalIndicators {
       const isVolumeLongSignal = volumeSignal === 'long-weak' || volumeSignal === 'long-strong';
       const isVolumeShortSignal = volumeSignal === 'short-weak' || volumeSignal === 'short-strong';
       
+      // Определяем тип RSI сигнала
+      const isRsiLongSignal = rsiSignal === 'long-weak' || rsiSignal === 'long-strong' || rsiSignal === 'long-extreme';
+      const isRsiShortSignal = rsiSignal === 'short-weak' || rsiSignal === 'short-strong' || rsiSignal === 'short-extreme';
+      
       if (isUptrend) {
-        longPercentage = 20 + (isLongSignal ? bidAskConfidence : 0) + (isVolumeLongSignal ? volumeConfidence : 0);
+        longPercentage = 20 + (isLongSignal ? bidAskConfidence : 0) + (isVolumeLongSignal ? volumeConfidence : 0) + (isRsiLongSignal ? rsiConfidence : 0);
       } else if (isDowntrend) {
-        shortPercentage = 20 + (isShortSignal ? bidAskConfidence : 0) + (isVolumeShortSignal ? volumeConfidence : 0);
+        shortPercentage = 20 + (isShortSignal ? bidAskConfidence : 0) + (isVolumeShortSignal ? volumeConfidence : 0) + (isRsiShortSignal ? rsiConfidence : 0);
         // НО Bid/Ask LONG сигнал все равно добавляет уверенность к LONG
         if (isLongSignal && bidAskConfidence > 0) {
-          longPercentage = bidAskConfidence + (isVolumeLongSignal ? volumeConfidence : 0);
+          longPercentage = bidAskConfidence + (isVolumeLongSignal ? volumeConfidence : 0) + (isRsiLongSignal ? rsiConfidence : 0);
         }
       } else {
-        // Если EMA нейтральный, но есть Bid/Ask или Volume сигнал
+        // Если EMA нейтральный, но есть Bid/Ask, Volume или RSI сигнал
         if (isLongSignal && bidAskConfidence > 0) {
-          longPercentage = bidAskConfidence + (isVolumeLongSignal ? volumeConfidence : 0);
+          longPercentage = bidAskConfidence + (isVolumeLongSignal ? volumeConfidence : 0) + (isRsiLongSignal ? rsiConfidence : 0);
         } else if (isShortSignal && bidAskConfidence > 0) {
-          shortPercentage = bidAskConfidence + (isVolumeShortSignal ? volumeConfidence : 0);
-        } else {
-          // Только Volume сигнал
-          if (isVolumeLongSignal) {
-            longPercentage = volumeConfidence;
-          } else if (isVolumeShortSignal) {
-            shortPercentage = volumeConfidence;
-          }
+          shortPercentage = bidAskConfidence + (isVolumeShortSignal ? volumeConfidence : 0) + (isRsiShortSignal ? rsiConfidence : 0);
         }
+      }
+      
+      // ВСЕГДА добавляем Volume и RSI сигналы, независимо от EMA тренда
+      if (isVolumeLongSignal || isRsiLongSignal) {
+        longPercentage += (isVolumeLongSignal ? volumeConfidence : 0) + (isRsiLongSignal ? rsiConfidence : 0);
+      }
+      if (isVolumeShortSignal || isRsiShortSignal) {
+        shortPercentage += (isVolumeShortSignal ? volumeConfidence : 0) + (isRsiShortSignal ? rsiConfidence : 0);
       }
     
     return {
       ema9: ema9,
       ema21: ema21,
       ema50: ema50,
-      rsi: priceArrayLength >= 3 ? this.calculateRSI(priceArray, Math.min(14, priceArrayLength - 1)) : 50,
+      rsi: rsi,
       macd: priceArrayLength >= 3 ? this.calculateMACD(priceArray) : { macd: 0, signal: 0, histogram: 0 },
       atr: priceArrayLength >= 3 ? this.calculateATR(priceArray, Math.min(14, priceArrayLength - 1)) : 0,
       volumeRatio: volumeRatio,
@@ -481,7 +525,10 @@ class TechnicalIndicators {
       bidAskSignal: bidAskSignal,
       // Volume анализ
       volumeConfidence: volumeConfidence,
-      volumeSignal: volumeSignal
+      volumeSignal: volumeSignal,
+      // RSI анализ
+      rsiConfidence: rsiConfidence,
+      rsiSignal: rsiSignal
     };
   }
 }
