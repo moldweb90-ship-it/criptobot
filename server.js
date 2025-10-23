@@ -737,6 +737,11 @@ class TechnicalIndicators {
         shortPercentage += spreadConfidence;
       }
     
+    // Получаем данные текущей и предыдущей свечи для фильтров
+    const candles = this.candleData[symbol] || [];
+    const currentCandle = candles.length > 0 ? candles[candles.length - 1] : null;
+    const previousCandle = candles.length > 1 ? candles[candles.length - 2] : null;
+    
     return {
       ema9: ema9,
       ema21: ema21,
@@ -775,7 +780,12 @@ class TechnicalIndicators {
       spreadSignal: spreadSignal,
       // EMA 9/21 анализ
       ema9_21Confidence: ema9_21Confidence,
-      ema9_21Signal: ema9_21Signal
+      ema9_21Signal: ema9_21Signal,
+      // Данные свечей для фильтров объема и направления
+      currentVolume: currentCandle ? currentCandle.volume : 0,
+      previousVolume: previousCandle ? previousCandle.volume : 0,
+      candleOpen: currentCandle ? currentCandle.open : 0,
+      candleClose: currentCandle ? currentCandle.close : 0
     };
   }
 }
