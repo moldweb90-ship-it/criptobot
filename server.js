@@ -1109,6 +1109,47 @@ wss.on('connection', (ws) => {
   // Отправляем текущие данные если они есть
   sendAllPricesToClients();
 
+  // Обработка тестовых команд
+  ws.on('message', (data) => {
+    try {
+      const message = JSON.parse(data);
+      
+      if (message.type === 'test_open_position') {
+        console.log('🧪 Тестовая команда: открытие позиции');
+        const testDeal = message.data;
+        
+        // Отправляем тестовую позицию клиенту
+        ws.send(JSON.stringify({
+          type: 'position_opened',
+          data: {
+            id: Date.now(),
+            symbol: testDeal.symbol,
+            direction: testDeal.direction === 'buy' ? 'LONG' : 'SHORT',
+            entryPrice: cryptoFuturesPrices[testDeal.symbol] || 100,
+            volume: 0.5,
+            amountUSD: 50,
+            tpPercent: testDeal.confidence >= 70 ? 0.3 : testDeal.confidence >= 55 ? 0.25 : 0.2,
+            slPercent: testDeal.confidence >= 70 ? 0.2 : testDeal.confidence >= 55 ? 0.16 : 0.12,
+            tpPrice: 0,
+            slPrice: 0,
+            openCommission: 0.02,
+            closeCommission: 0,
+            totalCommission: 0.02,
+            confidence: testDeal.confidence,
+            openTime: Date.now(),
+            currentPrice: cryptoFuturesPrices[testDeal.symbol] || 100,
+            unrealizedPnL: 0,
+            grossPnL: 0,
+            netPnL: 0
+          }
+        }));
+      }
+      
+    } catch (error) {
+      console.error('❌ Ошибка обработки сообщения:', error);
+    }
+  });
+
   ws.on('close', () => {
     console.log('👤 Клиент отключен');
   });

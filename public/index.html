@@ -661,10 +661,303 @@
     .open-deals-content {
       min-height: 200px;
       display: flex;
-      align-items: center;
-      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
       color: #a0aec0;
+      font-size: 14px;
+    }
+    
+    .open-deals-content:empty::before,
+    .open-deals-content .empty-state {
+      text-align: center;
+      padding: 40px;
+    }
+    
+    .open-deal-card {
+      background: white;
+      border-radius: 8px;
+      padding: 12px 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 60px;
+    }
+    
+    .open-deal-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .deal-left {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      min-width: 120px;
+    }
+    
+    .deal-center {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 140px;
+    }
+    
+    .deal-pnl {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 80px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: #f7fafc;
+    }
+    
+    .deal-pnl.profit {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+    
+    .deal-pnl.loss {
+      background: #fed7d7;
+      color: #742a2a;
+    }
+    
+    .deal-targets {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 100px;
+    }
+    
+    .deal-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      min-width: 80px;
+    }
+    
+    .deal-symbol {
+      font-weight: 700;
+      font-size: 14px;
+      color: #2d3748;
+    }
+    
+    .deal-action {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 2px;
+    }
+    
+    .deal-action.long {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+    
+    .deal-action.short {
+      background: #fed7d7;
+      color: #742a2a;
+    }
+    
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+    
+    .price-label {
+      color: #718096;
+      font-weight: 500;
+    }
+    
+    .price-value {
+      color: #2d3748;
+      font-weight: 700;
+    }
+    
+    .pnl-main {
       font-size: 16px;
+      font-weight: 800;
+    }
+    
+    .pnl-percent {
+      font-size: 11px;
+      font-weight: 600;
+    }
+    
+    .target-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+    }
+    
+    .target-label {
+      font-size: 12px;
+    }
+    
+    .target-value {
+      font-weight: 700;
+      color: #2d3748;
+    }
+    
+    .target-row.tp .target-value {
+      color: #38a169;
+    }
+    
+    .target-row.sl .target-value {
+      color: #e53e3e;
+    }
+    
+    .deal-volume {
+      font-weight: 600;
+      color: #2d3748;
+      font-size: 12px;
+    }
+    
+    .deal-time {
+      font-weight: 500;
+      color: #718096;
+      font-size: 11px;
+    }
+    
+    .pnl-info {
+      margin: 15px 0;
+      padding: 15px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    }
+    
+    .pnl-info.profit {
+      background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+      border: 2px solid #48bb78;
+    }
+    
+    .pnl-info.loss {
+      background: linear-gradient(135deg, #fed7d7 0%, #fc8181 100%);
+      border: 2px solid #f56565;
+    }
+    
+    .pnl-main {
+      font-size: 20px;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    
+    .pnl-info.profit .pnl-main {
+      color: #22543d;
+    }
+    
+    .pnl-info.loss .pnl-main {
+      color: #742a2a;
+    }
+    
+    .pnl-breakdown {
+      display: flex;
+      justify-content: space-around;
+      font-size: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .pnl-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .pnl-item span:first-child {
+      color: #718096;
+      font-weight: 500;
+    }
+    
+    .pnl-item span:last-child {
+      font-weight: 700;
+      color: #2d3748;
+    }
+    
+    .targets-info {
+      margin: 15px 0;
+    }
+    
+    .target-row {
+      margin: 12px 0;
+    }
+    
+    .target-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+    
+    .target-label {
+      font-weight: 600;
+      min-width: 40px;
+    }
+    
+    .target-value {
+      flex: 1;
+      font-weight: 700;
+      color: #2d3748;
+    }
+    
+    .target-row.tp .target-label,
+    .target-row.tp .target-value {
+      color: #38a169;
+    }
+    
+    .target-row.sl .target-label,
+    .target-row.sl .target-value {
+      color: #e53e3e;
+    }
+    
+    .target-progress {
+      width: 100%;
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    
+    .target-progress-bar {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+    
+    .target-progress-bar.tp {
+      background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+    }
+    
+    .target-progress-bar.sl {
+      background: linear-gradient(90deg, #fc8181 0%, #f56565 100%);
+    }
+    
+    .deal-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #e2e8f0;
+      font-size: 12px;
+      color: #718096;
+    }
+    
+    .deal-volume {
+      font-weight: 600;
+      color: #2d3748;
+    }
+    
+    .deal-time {
+      font-weight: 500;
     }
 
     /* Подготовка сделки (справа) */
@@ -1719,6 +2012,25 @@
             <div class="stats-item-label">💡 Expectancy</div>
             <div class="stats-item-value" id="stat-expectancy">+$0.00</div>
           </div>
+          
+          <div class="stats-item">
+            <div class="stats-item-label">💸 Комиссии</div>
+            <div class="stats-item-value negative" id="stat-total-fees">-$0.00</div>
+          </div>
+          
+          <div class="stats-item">
+            <div class="stats-item-label">📊 Gross PnL</div>
+            <div class="stats-item-value" id="stat-gross-pnl">+$0.00</div>
+          </div>
+          
+          <div class="stats-item">
+            <button onclick="closeAllPositions()" style="background: #e53e3e; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 8px;">
+              🛑 Закрыть все
+            </button>
+            <button onclick="clearAllData()" style="background: #9f7aea; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+              🗑️ Очистить все
+            </button>
+          </div>
         </div>
       </div>
       
@@ -1814,25 +2126,52 @@
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          // Восстанавливаем только активные таймеры (не истекшие)
           const now = Date.now();
           Object.keys(parsed).forEach(symbol => {
             const deal = parsed[symbol];
             if (deal && deal.timestamp) {
               const elapsed = Math.floor((now - deal.timestamp) / 1000);
               const remaining = deal.timerSeconds - elapsed;
-              if (remaining > 0) {
+              
+              if (remaining <= 0) {
+                // ⚠️ ТАЙМЕР ИСТЕК ВО ВРЕМЯ ЗАКРЫТОЙ СТРАНИЦЫ
+                console.log(`⏰ Таймер для ${symbol} истек во время закрытой страницы. Открываем сделку немедленно!`);
+                
+                // Открываем сделку автоматически после загрузки цен
+                setTimeout(() => {
+                  if (lastPrices[symbol]) {
+                    autoOpenDeal(symbol, deal);
+                  } else {
+                    console.error(`❌ ${symbol}: Цена еще не загружена, ждем...`);
+                    // Повторная попытка через 2 секунды
+                    setTimeout(() => {
+                      if (lastPrices[symbol]) {
+                        autoOpenDeal(symbol, deal);
+                      } else {
+                        console.error(`❌ ${symbol}: Не удалось получить цену, сделка отменена`);
+                      }
+                    }, 2000);
+                  }
+                }, 1500); // Даем 1.5 секунды на загрузку цен
+                
+                // НЕ добавляем в dealPrepData (истекшая сделка)
+              } else {
+                // Таймер еще активен - восстанавливаем с ОБНОВЛЕННЫМ timestamp
                 dealPrepData[symbol] = {
                   ...deal,
-                  timerSeconds: remaining
+                  timerSeconds: remaining,
+                  timestamp: now // ⚠️ КРИТИЧНО: обновляем timestamp!
                 };
                 // Восстанавливаем карточку
                 createOrUpdateDealCard(symbol, dealPrepData[symbol]);
                 
-                // Класс таймера устанавливается при создании карточки и не меняется
+                console.log(`🔄 Восстановлен таймер для ${symbol}: осталось ${remaining} секунд (timestamp обновлен)`);
               }
             }
           });
+          
+          // Сохраняем обновленные данные с новыми timestamp
+          saveDealPrepData();
         } catch (e) {
           console.log('Ошибка загрузки данных сделок:', e);
         }
@@ -1858,6 +2197,45 @@
     let closedDeals = []; // История закрытых сделок
     let isAutoTradingEnabled = false; // Режим автоторговли
     let isDarkTheme = false; // Тема интерфейса
+    let totalCommissions = 0; // Общая сумма комиссий
+    let cooldownSymbols = {}; // Кулдаун для монет после закрытия (symbol -> timestamp)
+    
+    // Константы Binance Futures
+    const FUTURES_TAKER_FEE = 0.0004; // 0.04% комиссия taker
+    const POSITION_SIZE_USD = 50; // Размер позиции в долларах
+    
+    // Функция расчета TP/SL по уверенности
+    function calculateTPSL(confidence) {
+      if (confidence >= 70) {
+        return { tp: 0.3, sl: 0.2 };  // TP 0.3%, SL 0.2%
+      } else if (confidence >= 55) {
+        return { tp: 0.25, sl: 0.16 }; // TP 0.25%, SL 0.16%
+      } else {
+        return null; // Не торгуем ниже 55%
+      }
+    }
+    
+    // Проверка кулдауна для монеты
+    function isSymbolInCooldown(symbol) {
+      if (!cooldownSymbols[symbol]) return false;
+      
+      const cooldownTime = 60 * 1000; // 1 минута в миллисекундах
+      const timeSinceClose = Date.now() - cooldownSymbols[symbol];
+      
+      if (timeSinceClose >= cooldownTime) {
+        // Кулдаун истек, удаляем из списка
+        delete cooldownSymbols[symbol];
+        return false;
+      }
+      
+      return true;
+    }
+    
+    // Добавление монеты в кулдаун
+    function addSymbolToCooldown(symbol) {
+      cooldownSymbols[symbol] = Date.now();
+      console.log(`⏰ ${symbol} добавлена в кулдаун на 1 минуту`);
+    }
     
     // Расчет нереализованного PnL (открытые позиции)
     function calculateUnrealizedPnL() {
@@ -1982,33 +2360,101 @@
       } else {
         expElement.classList.add('neutral');
       }
+      
+      // Обновляем комиссии
+      document.getElementById('stat-total-fees').textContent = `-$${totalCommissions.toFixed(2)}`;
+      
+      // Рассчитываем Gross PnL (до комиссий)
+      const grossPnL = closedDeals.reduce((sum, d) => sum + (d.grossProfit || d.realizedPnL), 0);
+      const grossElement = document.getElementById('stat-gross-pnl');
+      const grossSign = grossPnL >= 0 ? '+' : '';
+      grossElement.textContent = `${grossSign}$${grossPnL.toFixed(2)}`;
+      grossElement.className = 'stats-item-value';
+      if (grossPnL > 0) {
+        grossElement.classList.add('positive');
+      } else if (grossPnL < 0) {
+        grossElement.classList.add('negative');
+      } else {
+        grossElement.classList.add('neutral');
+      }
     }
     
     // Открытие позиции
-    function openPosition(symbol, direction, entryPrice, volume) {
+    function openPosition(symbol, direction, entryPrice, volumeUSD, confidence) {
+      const tpslLevels = calculateTPSL(confidence);
+      if (!tpslLevels) {
+        console.error(`❌ Уверенность ${confidence}% слишком низкая для открытия сделки`);
+        return null;
+      }
+      
+      // Для фьючерсов: объем = размер позиции / цена входа
+      const volume = volumeUSD / entryPrice;
+      const openCommission = volumeUSD * FUTURES_TAKER_FEE;
+      
+      // Рассчитываем TP и SL цены
+      const tpPrice = direction === 'LONG'
+        ? entryPrice * (1 + tpslLevels.tp / 100)
+        : entryPrice * (1 - tpslLevels.tp / 100);
+      
+      const slPrice = direction === 'LONG'
+        ? entryPrice * (1 - tpslLevels.sl / 100)
+        : entryPrice * (1 + tpslLevels.sl / 100);
+      
       const position = {
         id: Date.now(), // Уникальный ID
         symbol: symbol,
         direction: direction, // 'LONG' или 'SHORT'
         entryPrice: entryPrice,
         volume: volume,
-        amountUSD: entryPrice * volume,
+        amountUSD: volumeUSD,
+        tpPercent: tpslLevels.tp,
+        slPercent: tpslLevels.sl,
+        tpPrice: tpPrice,
+        slPrice: slPrice,
+        openCommission: openCommission,
+        closeCommission: 0,
+        totalCommission: openCommission,
+        confidence: confidence,
         openTime: Date.now(),
         currentPrice: entryPrice,
-        unrealizedPnL: 0
+        unrealizedPnL: 0,
+        grossPnL: 0,
+        netPnL: 0
       };
+
+      // Логирование открытия позиции
+      console.log(`🚀 ОТКРЫТА ПОЗИЦИЯ: ${symbol} ${direction}`);
+      console.log(`   Вход: $${entryPrice.toFixed(2)}`);
+      console.log(`   TP: $${tpPrice.toFixed(2)} (${tpslLevels.tp}%)`);
+      console.log(`   SL: $${slPrice.toFixed(2)} (${tpslLevels.sl}%)`);
+      console.log(`   Уверенность: ${confidence}%`);
       
       openPositions.push(position);
-      currentBalance -= position.amountUSD; // Вычитаем из баланса
+      currentBalance -= (volumeUSD + openCommission); // Вычитаем сумму + комиссию
+      totalCommissions += openCommission;
       
-      console.log(`📈 Открыта позиция: ${direction} ${symbol} @ $${entryPrice.toFixed(2)}, Volume: ${volume}`);
+      console.log(`📈 Открыта позиция: ${direction} ${symbol} @ $${entryPrice.toFixed(2)}`);
+      console.log(`   Объём: $${volumeUSD.toFixed(2)}, Комиссия: $${openCommission.toFixed(2)}`);
+      console.log(`   TP: $${tpPrice.toFixed(2)} (+${tpslLevels.tp}%), SL: $${slPrice.toFixed(2)} (-${tpslLevels.sl}%)`);
+      
+      // Создаем UI карточку
+      createOpenDealCard(position);
+      
+      // ⚠️ УБИРАЕМ МОНЕТУ ИЗ ПОДГОТОВКИ СДЕЛОК
+      if (dealPrepData[symbol]) {
+        delete dealPrepData[symbol];
+        removeDealCard(symbol);
+        saveDealPrepData();
+        console.log(`🗑️ ${symbol} удалена из подготовки сделок`);
+      }
       
       updateBalanceDisplay();
+      saveDealData();
       return position;
     }
     
     // Закрытие позиции
-    function closePosition(positionIndex, exitPrice) {
+    function closePosition(positionIndex, exitPrice, reason = 'MANUAL') {
       const position = openPositions[positionIndex];
       
       if (!position) {
@@ -2020,11 +2466,15 @@
         ? (exitPrice - position.entryPrice)
         : (position.entryPrice - exitPrice);
       
-      const profit = priceDiff * position.volume;
+      const grossProfit = priceDiff * position.volume;
+      const closeCommission = position.amountUSD * FUTURES_TAKER_FEE;
+      const totalCommission = position.openCommission + closeCommission;
+      const netProfit = grossProfit - totalCommission;
       
       // Обновляем балансы
-      realizedPnL += profit;
-      currentBalance += position.amountUSD + profit;
+      realizedPnL += netProfit;
+      currentBalance += position.amountUSD + netProfit;
+      totalCommissions += closeCommission;
       
       // Создаем запись о закрытой сделке
       const closedDeal = {
@@ -2032,33 +2482,178 @@
         exitPrice: exitPrice,
         closeTime: Date.now(),
         duration: Date.now() - position.openTime,
-        realizedPnL: profit,
-        profitPercent: (profit / position.amountUSD) * 100
+        closeCommission: closeCommission,
+        totalCommission: totalCommission,
+        grossProfit: grossProfit,
+        netProfit: netProfit,
+        realizedPnL: netProfit,
+        profitPercent: (netProfit / position.amountUSD) * 100,
+        closeReason: reason
       };
       
       closedDeals.push(closedDeal);
       openPositions.splice(positionIndex, 1);
       
-      console.log(`📉 Закрыта позиция: ${position.direction} ${position.symbol} @ $${exitPrice.toFixed(2)}, PnL: ${profit >= 0 ? '+' : ''}$${profit.toFixed(2)}`);
+      // Добавляем монету в кулдаун на 1 минуту
+      addSymbolToCooldown(position.symbol);
+      
+      const emoji = reason === 'TP' ? '🎯' : reason === 'SL' ? '🛑' : '👋';
+      console.log(`${emoji} Закрыта позиция: ${position.direction} ${position.symbol} @ $${exitPrice.toFixed(2)}`);
+      console.log(`   Причина: ${reason}`);
+      console.log(`   Gross PnL: ${grossProfit >= 0 ? '+' : ''}$${grossProfit.toFixed(2)}`);
+      console.log(`   Комиссия: -$${totalCommission.toFixed(2)}`);
+      console.log(`   Net PnL: ${netProfit >= 0 ? '+' : ''}$${netProfit.toFixed(2)}`);
+      
+      // Удаляем UI карточку
+      removeOpenDealCard(position.id);
       
       updateBalanceDisplay();
+      saveDealData();
       return closedDeal;
     }
     
-    // Обновление текущих цен в открытых позициях
+    // Обновление текущих цен в открытых позициях и мониторинг TP/SL
     function updateOpenPositionsPrices(data) {
-      openPositions.forEach(position => {
+      openPositions.forEach((position, index) => {
         if (data[position.symbol] && data[position.symbol].futures) {
-          position.currentPrice = data[position.symbol].futures.price;
+          const currentPrice = data[position.symbol].futures.price;
+          position.currentPrice = currentPrice;
           
-          // Пересчитываем unrealized PnL
+          // Пересчитываем PnL
           const priceDiff = position.direction === 'LONG' 
-            ? (position.currentPrice - position.entryPrice)
-            : (position.entryPrice - position.currentPrice);
+            ? (currentPrice - position.entryPrice)
+            : (position.entryPrice - currentPrice);
           
-          position.unrealizedPnL = priceDiff * position.volume;
+          const grossPnL = priceDiff * position.volume;
+          // НЕ вычитаем НИКАКИЕ комиссии из текущего PnL - только при закрытии!
+          const netPnL = grossPnL; // Показываем только движение цены!
+          
+          // СУПЕР ТОЧНЫЙ расчет - до 4 знаков после запятой
+          position.grossPnL = Math.round(grossPnL * 10000) / 10000;
+          position.netPnL = Math.round(netPnL * 10000) / 10000;
+          position.unrealizedPnL = position.netPnL;
+          
+          // Логирование только при значительных изменениях PnL
+          if (position.symbol === 'BTCUSDT' && Math.abs(position.netPnL) > 0.1) {
+            console.log(`💰 ${position.symbol}: PnL $${position.netPnL.toFixed(2)} (${((position.netPnL/position.amountUSD)*100).toFixed(2)}%)`);
+          }
+          
+          // ⚠️ ПРОВЕРКА TP
+          if (position.direction === 'LONG' && currentPrice >= position.tpPrice) {
+            const pnlPercent = ((currentPrice - position.entryPrice) / position.entryPrice) * 100;
+            console.log(`🎯 ${position.symbol}: Достигнут Take Profit!`);
+            console.log(`   Вход: $${position.entryPrice.toFixed(2)}, Текущая: $${currentPrice.toFixed(2)}, TP: $${position.tpPrice.toFixed(2)}`);
+            console.log(`   PnL: ${pnlPercent.toFixed(3)}% (цель: ${position.tpPercent}%)`);
+            closePosition(index, currentPrice, 'TP');
+            return;
+          }
+          if (position.direction === 'SHORT' && currentPrice <= position.tpPrice) {
+            const pnlPercent = ((position.entryPrice - currentPrice) / position.entryPrice) * 100;
+            console.log(`🎯 ${position.symbol}: Достигнут Take Profit!`);
+            console.log(`   Вход: $${position.entryPrice.toFixed(2)}, Текущая: $${currentPrice.toFixed(2)}, TP: $${position.tpPrice.toFixed(2)}`);
+            console.log(`   PnL: ${pnlPercent.toFixed(3)}% (цель: ${position.tpPercent}%)`);
+            closePosition(index, currentPrice, 'TP');
+            return;
+          }
+          
+          // ⚠️ ПРОВЕРКА SL
+          if (position.direction === 'LONG' && currentPrice <= position.slPrice) {
+            const pnlPercent = ((currentPrice - position.entryPrice) / position.entryPrice) * 100;
+            console.log(`🛑 ${position.symbol}: Сработал Stop Loss!`);
+            console.log(`   Вход: $${position.entryPrice.toFixed(2)}, Текущая: $${currentPrice.toFixed(2)}, SL: $${position.slPrice.toFixed(2)}`);
+            console.log(`   PnL: ${pnlPercent.toFixed(3)}% (лимит: -${position.slPercent}%)`);
+            closePosition(index, currentPrice, 'SL');
+            return;
+          }
+          if (position.direction === 'SHORT' && currentPrice >= position.slPrice) {
+            const pnlPercent = ((position.entryPrice - currentPrice) / position.entryPrice) * 100;
+            console.log(`🛑 ${position.symbol}: Сработал Stop Loss!`);
+            console.log(`   Вход: $${position.entryPrice.toFixed(2)}, Текущая: $${currentPrice.toFixed(2)}, SL: $${position.slPrice.toFixed(2)}`);
+            console.log(`   PnL: ${pnlPercent.toFixed(3)}% (лимит: -${position.slPercent}%)`);
+            closePosition(index, currentPrice, 'SL');
+            return;
+          }
+          
+          // Обновляем UI карточку
+          updateOpenDealCardPrices(position);
         }
       });
+    }
+    
+    // Автоматическое открытие сделки по истечению таймера
+    function autoOpenDeal(symbol, dealData) {
+      // ⚠️ КРИТИЧЕСКАЯ ПРОВЕРКА: Запрещаем дублирование монет
+      const existingPosition = openPositions.find(pos => pos.symbol === symbol);
+      if (existingPosition) {
+        console.error(`❌ ${symbol}: Уже есть открытая позиция! Дублирование запрещено.`);
+        return;
+      }
+      
+      // Получаем текущую рыночную цену из lastPrices (futures)
+      const entryPrice = lastPrices[symbol];
+      
+      if (!entryPrice) {
+        console.error(`❌ Цена для ${symbol} недоступна`);
+        return;
+      }
+      
+      // Проверяем достаточно ли баланса
+      const requiredBalance = POSITION_SIZE_USD + (POSITION_SIZE_USD * FUTURES_TAKER_FEE);
+      if (currentBalance < requiredBalance) {
+        console.error(`❌ Недостаточно средств для открытия сделки. Требуется: $${requiredBalance.toFixed(2)}, Доступно: $${currentBalance.toFixed(2)}`);
+        return;
+      }
+      
+      // Открываем позицию
+      const direction = dealData.direction === 'buy' ? 'LONG' : 'SHORT';
+      const position = openPosition(symbol, direction, entryPrice, POSITION_SIZE_USD, dealData.confidence);
+      
+      if (position) {
+        console.log(`✅ Автоматически открыта сделка ${symbol} ${direction} по цене $${entryPrice.toFixed(2)}`);
+      }
+    }
+    
+    // Сохранение/загрузка данных сделок
+    function saveDealData() {
+      try {
+        const data = {
+          openPositions: openPositions,
+          closedDeals: closedDeals,
+          currentBalance: currentBalance,
+          realizedPnL: realizedPnL,
+          totalCommissions: totalCommissions,
+          cooldownSymbols: cooldownSymbols,
+          timestamp: Date.now()
+        };
+        localStorage.setItem('tradingData', JSON.stringify(data));
+      } catch (e) {
+        console.error('Ошибка сохранения данных:', e);
+      }
+    }
+    
+    function loadDealData() {
+      try {
+        const saved = localStorage.getItem('tradingData');
+        if (saved) {
+          const data = JSON.parse(saved);
+          openPositions = data.openPositions || [];
+          closedDeals = data.closedDeals || [];
+          currentBalance = data.currentBalance || initialBalance;
+          realizedPnL = data.realizedPnL || 0;
+          totalCommissions = data.totalCommissions || 0;
+          cooldownSymbols = data.cooldownSymbols || {};
+          
+          // Восстанавливаем UI для открытых позиций
+          openPositions.forEach(position => {
+            createOpenDealCard(position);
+          });
+          
+          console.log(`✅ Загружены данные: ${openPositions.length} открытых, ${closedDeals.length} закрытых сделок`);
+          updateBalanceDisplay();
+        }
+      } catch (e) {
+        console.error('Ошибка загрузки данных:', e);
+      }
     }
     // ============================================
     
@@ -2388,6 +2983,29 @@
     }
 
     function updateDealPreparation(symbol, analytics) {
+      // ⚠️ КРИТИЧЕСКАЯ ПРОВЕРКА: Если уже есть открытая позиция - не добавляем в подготовку
+      const existingPosition = openPositions.find(pos => pos.symbol === symbol);
+      if (existingPosition) {
+        // Удаляем из подготовки если была
+        if (dealPrepData[symbol]) {
+          delete dealPrepData[symbol];
+          removeDealCard(symbol);
+          saveDealPrepData();
+        }
+        return;
+      }
+      
+      // ⚠️ ПРОВЕРКА КУЛДАУНА: Если монета в кулдауне - не добавляем в подготовку
+      if (isSymbolInCooldown(symbol)) {
+        // Удаляем из подготовки если была
+        if (dealPrepData[symbol]) {
+          delete dealPrepData[symbol];
+          removeDealCard(symbol);
+          saveDealPrepData();
+        }
+        return;
+      }
+      
       const longPercentage = analytics.longPercentage || 0;
       const shortPercentage = analytics.shortPercentage || 0;
       const currentPrice = lastPrices[symbol] || 0;
@@ -2573,6 +3191,134 @@
         card.remove();
       }
     }
+
+    // ============================================
+    // UI функции для открытых сделок
+    // ============================================
+    
+    function createOpenDealCard(position) {
+      const container = document.querySelector('.open-deals-content');
+      const config = cryptoConfig[position.symbol];
+      if (!config) return;
+      
+      // Удаляем пустое сообщение если есть
+      const emptyMsg = container.querySelector('.empty-state');
+      if (emptyMsg) emptyMsg.remove();
+      
+      let card = document.getElementById(`open-deal-${position.id}`);
+      
+      if (!card) {
+        card = document.createElement('div');
+        card.className = 'open-deal-card';
+        card.id = `open-deal-${position.id}`;
+        container.appendChild(card);
+      }
+      
+      const pnlClass = position.netPnL >= 0 ? 'profit' : 'loss';
+      const pnlSign = position.netPnL >= 0 ? '+' : '';
+      const pnlPercent = ((position.netPnL / position.amountUSD) * 100).toFixed(2);
+      
+      const directionClass = position.direction === 'LONG' ? 'long' : 'short';
+      const directionText = position.direction === 'LONG' ? 'ЛОНГ' : 'ШОРТ';
+      
+      // Рассчитываем прогресс до TP/SL
+      const distanceToTP = Math.abs(position.tpPrice - position.entryPrice);
+      const distanceToSL = Math.abs(position.slPrice - position.entryPrice);
+      const currentDistance = position.currentPrice - position.entryPrice;
+      
+      const tpProgress = position.direction === 'LONG'
+        ? Math.min(100, Math.max(0, (currentDistance / distanceToTP) * 100))
+        : Math.min(100, Math.max(0, ((position.entryPrice - position.currentPrice) / distanceToTP) * 100));
+      
+      const slProgress = position.direction === 'LONG'
+        ? Math.min(100, Math.max(0, ((position.entryPrice - position.currentPrice) / distanceToSL) * 100))
+        : Math.min(100, Math.max(0, (currentDistance / distanceToSL) * 100));
+      
+      card.innerHTML = `
+        <div class="deal-left">
+          <div class="deal-symbol">${config.symbol} ${config.name}</div>
+          <div class="deal-action ${directionClass}">${directionText}</div>
+        </div>
+        
+        <div class="deal-center">
+          <div class="price-row">
+            <span class="price-label">Вход:</span>
+            <span class="price-value">$${position.entryPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+          </div>
+          <div class="price-row">
+            <span class="price-label">Текущая:</span>
+            <span class="price-value" id="current-price-${position.id}">$${position.currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+          </div>
+        </div>
+        
+        <div class="deal-pnl ${pnlClass}">
+          <div class="pnl-main" id="pnl-main-${position.id}">
+            ${pnlSign}$${position.netPnL.toFixed(2)}
+          </div>
+          <div class="pnl-percent">${pnlSign}${pnlPercent}%</div>
+        </div>
+        
+        <div class="deal-targets">
+          <div class="target-row tp">
+            <span class="target-label">🎯</span>
+            <span class="target-value">$${position.tpPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+          </div>
+          <div class="target-row sl">
+            <span class="target-label">🛑</span>
+            <span class="target-value">$${position.slPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+          </div>
+        </div>
+        
+        <div class="deal-right">
+          <div class="deal-volume">$${position.amountUSD.toFixed(0)}</div>
+          <div class="deal-time">${new Date(position.openTime).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}</div>
+        </div>
+      `;
+    }
+    
+    function updateOpenDealCardPrices(position) {
+      const currentPriceEl = document.getElementById(`current-price-${position.id}`);
+      const pnlMainEl = document.getElementById(`pnl-main-${position.id}`);
+      const card = document.getElementById(`open-deal-${position.id}`);
+      
+      if (!card) return;
+      
+      if (currentPriceEl) {
+        currentPriceEl.textContent = `$${position.currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+      
+      if (pnlMainEl) {
+        const pnlSign = position.netPnL >= 0 ? '+' : '';
+        pnlMainEl.textContent = `${pnlSign}$${position.netPnL.toFixed(2)}`;
+        
+        // Обновляем класс PnL блока
+        const pnlBlock = pnlMainEl.closest('.deal-pnl');
+        if (pnlBlock) {
+          pnlBlock.className = `deal-pnl ${position.netPnL >= 0 ? 'profit' : 'loss'}`;
+        }
+        
+        // Обновляем процент
+        const pnlPercentEl = pnlBlock.querySelector('.pnl-percent');
+        if (pnlPercentEl) {
+          const pnlPercent = ((position.netPnL / position.amountUSD) * 100).toFixed(2);
+          pnlPercentEl.textContent = `${pnlSign}${pnlPercent}%`;
+        }
+      }
+    }
+    
+    function removeOpenDealCard(positionId) {
+      const card = document.getElementById(`open-deal-${positionId}`);
+      if (card) {
+        card.remove();
+      }
+      
+      // Если нет открытых сделок, показываем пустое сообщение
+      const container = document.querySelector('.open-deals-content');
+      if (container && container.children.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">Нет открытых сделок</div></div>';
+      }
+    }
+    // ============================================
 
       function updateTrendDots(symbol, isUptrend, isDowntrend, ema9_21Signal) {
         const dot1 = document.getElementById(`dot1-${symbol}`);
@@ -3483,11 +4229,10 @@
           
           // Когда таймер истек
           if (deal.timerSeconds === 0) {
-            console.log(`⏰ Время вышло для ${symbol}. Можно входить в сделку!`);
-            // Здесь можно добавить логику автоматического входа в сделку
-            // Удаляем из localStorage
-            delete dealPrepData[symbol];
-            saveDealPrepData();
+            console.log(`⏰ Время вышло для ${symbol}. Открываем сделку автоматически!`);
+            
+            // Автоматически открываем сделку
+            autoOpenDeal(symbol, deal);
           }
         }
       });
@@ -3496,8 +4241,85 @@
     // Запускаем обновление таймеров каждую секунду
     setInterval(updateTimers, 1000);
     
+    // Запускаем СУПЕР ЧУВСТВИТЕЛЬНЫЙ мониторинг TP/SL каждые 100мс
+    setInterval(() => {
+      if (openPositions.length > 0) {
+        // Получаем последние данные из lastPrices в правильном формате
+        const currentData = {};
+        openPositions.forEach(position => {
+          const symbol = position.symbol;
+          if (lastPrices[symbol]) {
+            currentData[symbol] = {
+              futures: { price: lastPrices[symbol] }
+            };
+          }
+        });
+        
+        if (Object.keys(currentData).length > 0) {
+          updateOpenPositionsPrices(currentData);
+        }
+      }
+    }, 100); // 100мс = 10 раз в секунду!
+    
     // Загружаем сохраненные данные при загрузке страницы
     loadDealPrepData();
+    loadDealData();
+    
+    // Функция очистки всех данных
+    window.clearAllData = function() {
+      const confirmClear = confirm(`🗑️ ОЧИСТИТЬ ВСЕ ДАННЫЕ?\n\nЭто удалит:\n• Все открытые позиции\n• Всю историю сделок\n• Подготовку сделок\n• Баланс и статистику\n\nЭто действие нельзя отменить!`);
+      if (!confirmClear) return;
+      
+      // Очищаем все массивы
+      openPositions = [];
+      closedDeals = [];
+      dealPrepData = {};
+      cooldownSymbols = {};
+      
+      // Сбрасываем баланс и статистику
+      currentBalance = initialBalance;
+      realizedPnL = 0;
+      totalCommissions = 0;
+      
+      // Очищаем localStorage
+      localStorage.removeItem('tradingData');
+      localStorage.removeItem('dealPrepData');
+      
+      // Очищаем UI
+      document.querySelector('.open-deals-content').innerHTML = '<div class="empty-state">Нет открытых позиций</div>';
+      updateBalanceDisplay();
+      updateTradingStats();
+      
+      console.log('🗑️ Все данные очищены!');
+      alert('✅ Все данные успешно очищены!');
+    };
+    
+    // Функция закрытия всех позиций
+    window.closeAllPositions = function() {
+      if (openPositions.length === 0) {
+        alert('❌ Нет открытых позиций для закрытия');
+        return;
+      }
+      
+      const confirmClose = confirm(`🛑 Закрыть все ${openPositions.length} позиций?\n\nЭто действие нельзя отменить!`);
+      if (!confirmClose) {
+        return;
+      }
+      
+      console.log(`🛑 Закрываем все ${openPositions.length} позиций...`);
+      
+      // Закрываем все позиции в обратном порядке (чтобы индексы не сбились)
+      for (let i = openPositions.length - 1; i >= 0; i--) {
+        const position = openPositions[i];
+        const currentPrice = lastPrices[position.symbol] || position.entryPrice;
+        
+        console.log(`🛑 Закрываем ${position.direction} ${position.symbol} @ $${currentPrice.toFixed(2)}`);
+        closePosition(i, currentPrice, 'MANUAL_CLOSE_ALL');
+      }
+      
+      console.log('✅ Все позиции закрыты!');
+      alert(`✅ Закрыто ${openPositions.length} позиций`);
+    };
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
