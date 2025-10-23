@@ -26,6 +26,140 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    /* Бургерное меню */
+    .burger-button {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 40px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .burger-line {
+      width: 24px;
+      height: 3px;
+      background: #2d3748;
+      margin: 2px 0;
+      transition: all 0.3s ease;
+      border-radius: 2px;
+    }
+
+    .burger-button:hover .burger-line {
+      background: #4299e1;
+    }
+
+    .burger-button.active .burger-line:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .burger-button.active .burger-line:nth-child(2) {
+      opacity: 0;
+    }
+
+    .burger-button.active .burger-line:nth-child(3) {
+      transform: rotate(-45deg) translate(7px, -6px);
+    }
+
+    .burger-menu-content {
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 0;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      min-width: 280px;
+      max-width: 320px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+      z-index: 2000;
+    }
+
+    .burger-menu-content.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .burger-menu-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .burger-menu-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .burger-menu-subtitle {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .burger-menu-items {
+      padding: 10px 0;
+    }
+
+    .burger-menu-item {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      color: #2d3748;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border-left: 4px solid transparent;
+    }
+
+    .burger-menu-item:hover {
+      background: #f7fafc;
+      border-left-color: #4299e1;
+      color: #4299e1;
+    }
+
+    .burger-menu-item.active {
+      background: #e6fffa;
+      border-left-color: #38a169;
+      color: #38a169;
+    }
+
+    .burger-menu-icon {
+      font-size: 20px;
+      margin-right: 12px;
+      width: 24px;
+      text-align: center;
+    }
+
+    .burger-menu-text {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .burger-menu-desc {
+      font-size: 11px;
+      color: #718096;
+      margin-top: 2px;
+    }
+
+    .burger-menu-divider {
+      height: 1px;
+      background: #e2e8f0;
+      margin: 10px 20px;
     }
 
     .crypto-grid {
@@ -2016,12 +2150,99 @@
       color: #a0aec0;
     }
 
+    /* Dark theme для бургерного меню */
+    body.dark-theme .burger-line {
+      background: #e2e8f0;
+    }
+
+    body.dark-theme .burger-button:hover .burger-line {
+      background: #4299e1;
+    }
+
+    body.dark-theme .burger-menu-content {
+      background: rgba(45, 55, 72, 0.98);
+    }
+
+    body.dark-theme .burger-menu-item {
+      color: #e2e8f0;
+    }
+
+    body.dark-theme .burger-menu-item:hover {
+      background: #4a5568;
+      color: #4299e1;
+    }
+
+    body.dark-theme .burger-menu-item.active {
+      background: #2d5a3d;
+      color: #68d391;
+    }
+
+    body.dark-theme .burger-menu-desc {
+      color: #a0aec0;
+    }
+
+    body.dark-theme .burger-menu-divider {
+      background: #4a5568;
+    }
+
   </style>
 </head>
 <body>
   <!-- Верхнее меню -->
   <div class="top-menu">
     <div class="menu-section">
+      <!-- Бургерное меню -->
+      <div class="menu-item" style="position: relative; cursor: pointer;" id="burgerMenuItem">
+        <button class="burger-button" id="burgerButton" style="background: none; border: none; cursor: pointer; padding: 0; margin: 0;">
+          <div class="burger-line"></div>
+          <div class="burger-line"></div>
+          <div class="burger-line"></div>
+        </button>
+        
+        <div class="burger-menu-content" id="burgerMenuContent">
+          <div class="burger-menu-header">
+            <div class="burger-menu-title">🎯 Crypto Bot</div>
+            <div class="burger-menu-subtitle">Торговые стратегии</div>
+          </div>
+          
+          <div class="burger-menu-items">
+            <a href="/" class="burger-menu-item active">
+              <div class="burger-menu-icon">🏠</div>
+              <div>
+                <div class="burger-menu-text">Основная стратегия</div>
+                <div class="burger-menu-desc">Консервативная TP/SL</div>
+              </div>
+            </a>
+            
+            <a href="/rsi" class="burger-menu-item">
+              <div class="burger-menu-icon">📊</div>
+              <div>
+                <div class="burger-menu-text">RSI стратегия</div>
+                <div class="burger-menu-desc">Экстремумы RSI</div>
+              </div>
+            </a>
+            
+            <div class="burger-menu-divider"></div>
+            
+            <a href="#" class="burger-menu-item">
+              <div class="burger-menu-icon">⚙️</div>
+              <div>
+                <div class="burger-menu-text">Настройки</div>
+                <div class="burger-menu-desc">Скоро...</div>
+              </div>
+            </a>
+            
+            <a href="#" class="burger-menu-item">
+              <div class="burger-menu-icon">📈</div>
+              <div>
+                <div class="burger-menu-text">MACD стратегия</div>
+                <div class="burger-menu-desc">В разработке</div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+      
       <div class="menu-item menu-balance">
         <span style="font-size: 20px;">💰</span>
         <div style="display: flex; flex-direction: column; gap: 2px;">
@@ -2313,6 +2534,34 @@
   </div>
 
   <script>
+    // Бургерное меню
+    document.addEventListener('DOMContentLoaded', function() {
+      const burgerButton = document.getElementById('burgerButton');
+      const burgerMenuContent = document.getElementById('burgerMenuContent');
+      
+      burgerButton.addEventListener('click', function() {
+        burgerButton.classList.toggle('active');
+        burgerMenuContent.classList.toggle('active');
+      });
+      
+      // Закрытие меню при клике вне его
+      document.addEventListener('click', function(event) {
+        if (!burgerButton.contains(event.target) && !burgerMenuContent.contains(event.target)) {
+          burgerButton.classList.remove('active');
+          burgerMenuContent.classList.remove('active');
+        }
+      });
+      
+      // Закрытие меню при клике на пункт меню
+      const menuItems = document.querySelectorAll('.burger-menu-item');
+      menuItems.forEach(item => {
+        item.addEventListener('click', function() {
+          burgerButton.classList.remove('active');
+          burgerMenuContent.classList.remove('active');
+        });
+      });
+    });
+
     const ws = new WebSocket('ws://localhost:5000');
     const cryptoGrid = document.getElementById('cryptoGrid');
     const analyticsGrid = document.getElementById('analyticsGrid');
@@ -4658,7 +4907,11 @@
     };
 
     ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+      const message = JSON.parse(event.data);
+      
+      // Проверяем тип сообщения
+      if (message.type === 'prices') {
+        const data = message.data;
       
       // Обновляем цены в открытых позициях
       updateOpenPositionsPrices(data);
@@ -4703,6 +4956,7 @@
       
       // Обновляем верхнее меню
       updateTopMenu(activeCoins, longSignals, shortSignals, totalVolumeRatio, totalRsi);
+      } // Закрываем if (message.type === 'prices')
     };
     
     function updateTopMenu(activeCoins, longSignals, shortSignals, totalVolumeRatio, totalRsi) {

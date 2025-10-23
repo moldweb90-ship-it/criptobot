@@ -26,6 +26,7 @@ let cryptoPrices = {};
 let cryptoFuturesPrices = {};
 let cryptoAnalytics = {};
 let cryptoOrderBook = {};
+let cryptoRSI = {}; // RSI данные для 3м
 
 // EWMA фильтры для Bid/Ask Ratio (α = 0.3)
 let bidAskRatioFilters = {};
@@ -86,10 +87,13 @@ class TechnicalIndicators {
       this.candleData[symbol] = [];
     }
 
-    // Для 15-минутного таймфрейма группируем данные по 15-минутным интервалам
+    // Группируем данные по интервалам в зависимости от таймфрейма
     const currentTime = new Date(timestamp);
     const candleTime = new Date(currentTime);
-    candleTime.setMinutes(Math.floor(currentTime.getMinutes() / 15) * 15, 0, 0);
+    
+    // Определяем интервал в зависимости от таймфрейма
+    const interval = timeframe === '3m' ? 3 : 15;
+    candleTime.setMinutes(Math.floor(currentTime.getMinutes() / interval) * interval, 0, 0);
 
     // Находим или создаем свечу для текущего 15-минутного интервала
     let candle = this.candleData[symbol].find(c => c.time.getTime() === candleTime.getTime());
@@ -149,28 +153,80 @@ class TechnicalIndicators {
   calculateRSI(prices, period = 14) {
     if (prices.length < period + 1) return null;
     
-    // Используем сглаженный RSI для более стабильных значений на 15-минутном таймфрейме
+    // Берем только последние 30 свечей для расчета (оптимизация)
+    const recentPrices = prices.length > 30 ? prices.slice(-30) : prices;
+    
+    if (recentPrices.length < period + 1) return null;
+    
+    // Используем точный алгоритм Wilder's RSI как на Binance
+    let gains = [];
+    let losses = [];
+    
+    // Рассчитываем изменения цен
+    for (let i = 1; i < recentPrices.length; i++) {
+      const change = recentPrices[i] - recentPrices[i - 1];
+      gains.push(change > 0 ? change : 0);
+      losses.push(change < 0 ? -change : 0);
+    }
+    
+    // Первый расчет средних значений (простое среднее)
     let avgGain = 0;
     let avgLoss = 0;
     
-    // Первый расчет средних значений
-    for (let i = 1; i <= period; i++) {
-      const change = prices[i] - prices[i - 1];
-      if (change > 0) avgGain += change;
-      else avgLoss -= change;
+    for (let i = 0; i < period; i++) {
+      avgGain += gains[i];
+      avgLoss += losses[i];
     }
     
     avgGain /= period;
     avgLoss /= period;
     
-    // Сглаживание для последующих значений
-    for (let i = period + 1; i < prices.length; i++) {
+    // Сглаживание по Wilder (экспоненциальное сглаживание)
+    for (let i = period; i < gains.length; i++) {
+      avgGain = ((avgGain * (period - 1)) + gains[i]) / period;
+      avgLoss = ((avgLoss * (period - 1)) + losses[i]) / period;
+    }
+    
+    if (avgLoss === 0) return 100;
+    
+    const rs = avgGain / avgLoss;
+    const rsi = 100 - (100 / (1 + rs));
+    
+    // Округляем до 2 знаков как на Binance и ограничиваем в разумных пределах
+    return Math.max(0, Math.min(100, Math.round(rsi * 100) / 100));
+  }
+
+  // RSI для 3м - точный алгоритм Wilder's как на Binance
+  calculateRSI3m(prices, period = 14) {
+    if (prices.length < period + 1) return null;
+    
+    // Используем тот же алгоритм что и для 15м
+    let gains = [];
+    let losses = [];
+    
+    // Рассчитываем изменения цен
+    for (let i = 1; i < prices.length; i++) {
       const change = prices[i] - prices[i - 1];
-      const gain = change > 0 ? change : 0;
-      const loss = change < 0 ? -change : 0;
-      
-      avgGain = ((avgGain * (period - 1)) + gain) / period;
-      avgLoss = ((avgLoss * (period - 1)) + loss) / period;
+      gains.push(change > 0 ? change : 0);
+      losses.push(change < 0 ? -change : 0);
+    }
+    
+    // Первый расчет средних значений (простое среднее)
+    let avgGain = 0;
+    let avgLoss = 0;
+    
+    for (let i = 0; i < period; i++) {
+      avgGain += gains[i];
+      avgLoss += losses[i];
+    }
+    
+    avgGain /= period;
+    avgLoss /= period;
+    
+    // Сглаживание по Wilder (экспоненциальное сглаживание)
+    for (let i = period; i < gains.length; i++) {
+      avgGain = ((avgGain * (period - 1)) + gains[i]) / period;
+      avgLoss = ((avgLoss * (period - 1)) + losses[i]) / period;
     }
     
     if (avgLoss === 0) return 100;
@@ -620,7 +676,7 @@ class TechnicalIndicators {
       let macdConfidence = 0;
       let macdSignal = 'neutral'; // neutral, long, short
       
-      if (macd.macd !== 0 && macd.signal !== 0) {
+      if (macd && macd.macd !== 0 && macd.signal !== 0) {
         // Основной сигнал: MACD vs Signal
         if (macd.macd > macd.signal) {
           macdSignal = 'long';
@@ -788,9 +844,136 @@ class TechnicalIndicators {
       candleClose: currentCandle ? currentCandle.close : 0
     };
   }
+
+  // Упрощенная аналитика для 3-минутного таймфрейма (только RSI)
+  getAnalytics3m(symbol) {
+    const prices = this.priceHistory[symbol];
+    
+    if (!prices || prices.length < 2) return null;
+    
+    let priceArray = prices.map(p => p.price);
+    
+    // Добавляем текущую futures цену для обновления индикаторов в реальном времени
+    const currentFuturesPrice = cryptoFuturesPrices[symbol] ? cryptoFuturesPrices[symbol].price : null;
+    if (currentFuturesPrice && priceArray.length > 0) {
+      // Заменяем последнюю цену на текущую futures цену для более точных расчетов
+      priceArray[priceArray.length - 1] = currentFuturesPrice;
+    }
+    
+    const priceArrayLength = priceArray.length;
+    
+    // Рассчитываем RSI для 3м с помощью специальной функции
+    const rsi = priceArrayLength >= 15 ? this.calculateRSI3m(priceArray, 14) : 50;
+    
+    // Базовые EMA для 3м (упрощенные)
+    const ema9 = priceArrayLength >= 3 ? this.calculateEMA(priceArray, Math.min(9, priceArrayLength)) : priceArray[priceArray.length - 1];
+    const ema21 = priceArrayLength >= 3 ? this.calculateEMA(priceArray, Math.min(21, priceArrayLength)) : priceArray[priceArray.length - 1];
+    const ema50 = priceArrayLength >= 3 ? this.calculateEMA(priceArray, Math.min(50, priceArrayLength)) : priceArray[priceArray.length - 1];
+    
+    // Упрощенный MACD для 3м
+    const macd = priceArrayLength >= 3 ? this.calculateMACD(priceArray) : { macd: 0, signal: 0, histogram: 0 };
+    
+    // Упрощенный ATR для 3м
+    const atr = priceArrayLength >= 3 ? this.calculateATR(priceArray, Math.min(14, priceArrayLength - 1)) : 0;
+    
+    // Упрощенный Volume Ratio для 3м
+    const volumes = this.volumeHistory[symbol];
+    const volumeArray = volumes ? volumes.map(v => v.volume) : [];
+    const volumeRatio = volumeArray.length >= 20 ? this.calculateVolumeRatio(volumeArray) : null;
+    
+    return {
+      rsi: rsi,
+      ema9: ema9,
+      ema21: ema21,
+      ema50: ema50,
+      macd: macd,
+      atr: atr,
+      volumeRatio: volumeRatio
+    };
+  }
 }
 
 const indicators = new TechnicalIndicators();
+const indicators3m = new TechnicalIndicators(); // Индикаторы для 3-минутного таймфрейма
+
+// Получение RSI через Binance API для 3-минутного таймфрейма
+async function fetchRSIFromBinance(symbol) {
+  try {
+    const response = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=3m&limit=100`);
+    const data = await response.json();
+    
+    if (data && data.length >= 15) {
+      // Используем тот же алгоритм что и на главной странице
+      const prices = data.map(kline => parseFloat(kline[4])); // Close prices
+      
+      // Рассчитываем RSI точно как в TechnicalIndicators.calculateRSI
+      let gains = [];
+      let losses = [];
+      
+      // Рассчитываем изменения цен
+      for (let i = 1; i < prices.length; i++) {
+        const change = prices[i] - prices[i - 1];
+        gains.push(change > 0 ? change : 0);
+        losses.push(change < 0 ? -change : 0);
+      }
+      
+      // Первый расчет средних значений (простое среднее)
+      let avgGain = 0;
+      let avgLoss = 0;
+      
+      for (let i = 0; i < 14; i++) {
+        avgGain += gains[i];
+        avgLoss += losses[i];
+      }
+      
+      avgGain /= 14;
+      avgLoss /= 14;
+      
+      // Сглаживание по Wilder (экспоненциальное сглаживание)
+      for (let i = 14; i < gains.length; i++) {
+        avgGain = ((avgGain * 13) + gains[i]) / 14;
+        avgLoss = ((avgLoss * 13) + losses[i]) / 14;
+      }
+      
+      if (avgLoss === 0) {
+        cryptoRSI[symbol] = 100;
+      } else {
+        const rs = avgGain / avgLoss;
+        const rsi = 100 - (100 / (1 + rs));
+        cryptoRSI[symbol] = Math.max(0, Math.min(100, Math.round(rsi * 100) / 100));
+      }
+    }
+  } catch (error) {
+    console.error(`❌ Ошибка получения RSI для ${symbol}:`, error);
+  }
+}
+
+// Получение реальных исторических данных с Binance для 3-минутного таймфрейма
+async function fetchHistoricalData3m(symbol) {
+  try {
+    const response = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=3m&limit=100`);
+    const data = await response.json();
+    
+    for (const kline of data) {
+      const closePrice = parseFloat(kline[4]);
+      const volume = parseFloat(kline[5]);
+      const timestamp = kline[6]; // Время закрытия свечи
+      const ohlc = {
+        open: parseFloat(kline[1]),
+        high: parseFloat(kline[2]),
+        low: parseFloat(kline[3]),
+        close: closePrice
+      };
+      
+      // Добавляем исторические данные в индикаторы для 3м
+      indicators3m.updateHistory(symbol, closePrice, volume, timestamp, '3m', ohlc);
+    }
+    
+    console.log(`✅ Исторические данные (3m) для ${symbol} загружены (${data.length} свечей)`);
+  } catch (error) {
+    console.error(`❌ Ошибка загрузки исторических данных (3m) для ${symbol}:`, error);
+  }
+}
 
 // Получение реальных исторических данных с Binance для 15-минутного таймфрейма
 async function fetchHistoricalData(symbol) {
@@ -849,6 +1032,9 @@ function connectToBinance() {
       // Обновляем постоянно, чтобы текущая свеча была актуальной
       indicators.updateHistory(symbol, closePrice, volume, timestamp, '15m', ohlc);
       
+      // Обновляем RSI в реальном времени постоянно (каждую секунду)
+      fetchRSIFromBinance(symbol);
+      
       // Логируем только когда свеча закрывается
       if (isClosed && symbol === 'BTCUSDT') {
         const analytics = indicators.getAnalytics(symbol);
@@ -890,6 +1076,58 @@ function connectToBinance() {
   binanceWs.on('close', () => {
     console.log('⚠️ Binance WS закрыт. Переподключение через 5 сек...');
     setTimeout(connectToBinance, 5000);
+  });
+}
+
+// WebSocket для 3-минутных свечей (futures)
+let futures3mWs = null;
+
+function connectToFutures3m() {
+  // Создаем WebSocket для 3-минутных свечей
+  const streams = cryptos.map(symbol => `${symbol.toLowerCase()}@kline_3m`).join('/');
+  futures3mWs = new WebSocket(`wss://fstream.binance.com/stream?streams=${streams}`);
+  
+  futures3mWs.on('open', () => {
+    console.log('✅ Подключено к Binance Futures 3m Kline WebSocket для всех монет');
+  });
+  
+  futures3mWs.on('message', (data) => {
+    try {
+      const message = JSON.parse(data);
+      
+      if (message.data) {
+        const kline = message.data.k;
+        const symbol = message.data.s;
+        const closePrice = parseFloat(kline.c);
+        const volume = parseFloat(kline.v);
+        const timestamp = kline.T; // Время закрытия свечи
+        const isClosed = kline.x; // Свеча закрыта?
+        
+        const ohlc = {
+          open: parseFloat(kline.o),
+          high: parseFloat(kline.h),
+          low: parseFloat(kline.l),
+          close: closePrice
+        };
+        
+                    // Обновляем индикаторы для 3м (обновляем постоянно для текущей свечи)
+                    indicators3m.updateHistory(symbol, closePrice, volume, timestamp, '3m', ohlc);
+                    
+                    // Обновляем RSI в реальном времени постоянно
+                    fetchRSIFromBinance(symbol);
+      }
+    } catch (error) {
+      console.error('❌ Ошибка обработки 3m kline:', error);
+    }
+  });
+  
+  futures3mWs.on('error', (error) => {
+    console.error('❌ Futures 3m WS ошибка:', error);
+  });
+  
+  futures3mWs.on('close', () => {
+    console.log('⚠️ Futures 3m WS закрыт. Переподключение через 5 сек...');
+    setTimeout(connectToFutures3m, 5000);
   });
 }
 
@@ -1058,12 +1296,16 @@ function connectToDepth() {
 
 function sendAllPricesToClients() {
   const allPrices = {};
+  const allAnalytics3m = {};
   
   // Собираем данные по всем монетам
   cryptos.forEach(symbol => {
     if (cryptoPrices[symbol] && cryptoFuturesPrices[symbol]) {
       // Получаем аналитику для символа (15-минутный таймфрейм)
       const analytics = indicators.getAnalytics(symbol);
+      
+      // Получаем аналитику для 3-минутного таймфрейма
+      const analytics3m = indicators3m.getAnalytics3m(symbol);
       
       // Получаем данные стакана заявок
       const orderBookData = cryptoOrderBook[symbol];
@@ -1094,17 +1336,31 @@ function sendAllPricesToClients() {
         },
         timeframe: '15m' // Указываем таймфрейм
       };
+      
+      // Собираем данные для 3м отдельно - используем RSI из API
+      allAnalytics3m[symbol] = {
+        rsi: cryptoRSI[symbol] || null, // RSI напрямую из Binance API
+        ema9: analytics3m ? analytics3m.ema9 : null,
+        ema21: analytics3m ? analytics3m.ema21 : null,
+        ema50: analytics3m ? analytics3m.ema50 : null,
+        macd: analytics3m ? analytics3m.macd : null,
+        atr: analytics3m ? analytics3m.atr : null,
+        volumeRatio: analytics3m ? analytics3m.volumeRatio : null,
+        timeframe: '3m'
+      };
     }
   });
 
   // Отправляем данные МГНОВЕННО всем подключенным клиентам
   if (Object.keys(allPrices).length > 0) {
-    const dataString = JSON.stringify(allPrices);
-    
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         try {
-          client.send(dataString);
+          // Отправляем основные данные (15м)
+          client.send(JSON.stringify({ type: 'prices', data: allPrices }));
+          
+          // Отправляем данные для 3м
+          client.send(JSON.stringify({ type: 'analytics3m', data: allAnalytics3m }));
         } catch (error) {
           console.error(`❌ Ошибка отправки данных клиенту:`, error);
         }
@@ -1167,10 +1423,12 @@ wss.on('connection', (ws) => {
 
 // Загружаем реальные исторические данные с Binance для всех криптовалют
 async function initializeRealData() {
-  console.log('🔄 Загружаем реальные исторические данные с Binance...');
+  console.log('🔄 Загружаем реальные исторические данные с Binance (15m и 3m)...');
   
   for (const symbol of cryptos) {
-    await fetchHistoricalData(symbol);
+    await fetchHistoricalData(symbol); // 15m
+    await fetchHistoricalData3m(symbol); // 3m futures
+    await fetchRSIFromBinance(symbol); // RSI для 3м
     // Небольшая задержка чтобы не превысить лимиты API
     await new Promise(resolve => setTimeout(resolve, 100));
   }
@@ -1183,16 +1441,35 @@ initializeRealData();
 
 connectToBinance();
 connectToFutures();
+connectToFutures3m(); // Подключение к 3-минутным свечам
 connectToDepth();
 
-// Периодическое обновление индикаторов в реальном времени (каждые 2 секунды)
+// Периодическое обновление RSI в реальном времени каждую секунду
 setInterval(() => {
+  // Обновляем RSI для всех криптовалют каждую секунду
+  cryptos.forEach(symbol => {
+    fetchRSIFromBinance(symbol);
+  });
+  
   // Отправляем обновленные данные всем клиентам с актуальными индикаторами
   sendAllPricesToClients();
-}, 2000);
+}, 1000);
+
+// RSI обновляется в реальном времени через WebSocket - НЕТ ЗАДЕРЖЕК!
+
+// Роутинг для разных стратегий
+app.get('/', (req, res) => {
+  res.sendFile('index.html', { root: 'public' });
+});
+
+app.get('/rsi', (req, res) => {
+  res.sendFile('rsi.html', { root: 'public' });
+});
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`🚀 Сервер запущен: http://localhost:${PORT}`);
+  console.log(`📈 Основная стратегия: http://localhost:${PORT}/`);
+  console.log(`📊 RSI стратегия: http://localhost:${PORT}/rsi`);
 });
 
