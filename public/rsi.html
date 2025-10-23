@@ -498,7 +498,7 @@
           <div class="rule-desc">
             RSI ≤ 25 (перепроданность)<br>
             Моментальное открытие позиции<br>
-            TP: 0.5%, SL: 0.2%
+            TP: 0.69%, SL: 0.31%
           </div>
         </div>
         <div class="rule-card short">
@@ -506,7 +506,7 @@
           <div class="rule-desc">
             RSI ≥ 75 (перекупленность)<br>
             Моментальное открытие позиции<br>
-            TP: 0.5%, SL: 0.2%
+            TP: 0.69%, SL: 0.31%
           </div>
         </div>
         <div class="rule-card">
@@ -514,7 +514,7 @@
           <div class="rule-desc">
             Размер позиции: $50<br>
             Таймфрейм: 3 минуты<br>
-            R:R = 1:2.5
+            R:R = 1:2.23
           </div>
         </div>
       </div>
@@ -787,13 +787,13 @@
       const volume = POSITION_SIZE_USD / entryPrice;
       const openCommission = POSITION_SIZE_USD * FUTURES_TAKER_FEE;
       
-      // RSI стратегия: TP 0.5%, SL 0.2%
+      // RSI стратегия: TP 0.69%, SL 0.31%
       const tpPrice = direction === 'LONG' 
-        ? entryPrice * (1 + 0.5 / 100) 
-        : entryPrice * (1 - 0.5 / 100);
+        ? entryPrice * (1 + 0.69 / 100) 
+        : entryPrice * (1 - 0.69 / 100);
       const slPrice = direction === 'LONG' 
-        ? entryPrice * (1 - 0.2 / 100) 
-        : entryPrice * (1 + 0.2 / 100);
+        ? entryPrice * (1 - 0.31 / 100) 
+        : entryPrice * (1 + 0.31 / 100);
       
       const position = {
         id: Date.now(),
@@ -802,8 +802,8 @@
         entryPrice: entryPrice,
         volume: volume,
         amountUSD: POSITION_SIZE_USD,
-        tpPercent: 0.5,
-        slPercent: 0.2,
+        tpPercent: 0.69,
+        slPercent: 0.31,
         tpPrice: tpPrice,
         slPrice: slPrice,
         openCommission: openCommission,
