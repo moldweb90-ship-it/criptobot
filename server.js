@@ -1466,6 +1466,121 @@ app.get('/rsi', (req, res) => {
   res.sendFile('rsi.html', { root: 'public' });
 });
 
+// API endpoint для анализа RSI экстремумов за 24 часа
+app.get('/api/rsi-analysis/:symbol', async (req, res) => {
+  try {
+    const symbol = req.params.symbol.toUpperCase();
+    const response = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=3m&limit=480`); // 480 свечей = 24 часа
+    const data = await response.json();
+    
+    if (!data || data.length === 0) {
+      return res.status(404).json({ error: 'Данные не найдены' });
+    }
+    
+    // Рассчитываем RSI для каждой свечи
+    const rsiValues = [];
+    const prices = data.map(kline => parseFloat(kline[4])); // Close prices
+    
+    for (let i = 14; i < prices.length; i++) {
+      const rsi = calculateRSIForPeriod(prices.slice(0, i + 1), 14);
+      if (rsi !== null) {
+        rsiValues.push({
+          timestamp: data[i][6], // Время закрытия свечи
+          rsi: rsi,
+          price: prices[i]
+        });
+      }
+    }
+    
+    // Подсчитываем касания экстремумов
+    const upperTouches = rsiValues.filter(item => item.rsi >= 75).length;
+    const lowerTouches = rsiValues.filter(item => item.rsi <= 25).length;
+    
+    // Находим последние касания
+    const lastUpperTouch = rsiValues.filter(item => item.rsi >= 75).pop();
+    const lastLowerTouch = rsiValues.filter(item => item.rsi <= 25).pop();
+    
+    // Отладочная информация
+    console.log(`📊 RSI Analysis for ${symbol}:`);
+    console.log(`   Total candles: ${data.length}`);
+    console.log(`   RSI values calculated: ${rsiValues.length}`);
+    console.log(`   Upper touches (≥75): ${upperTouches}`);
+    console.log(`   Lower touches (≤25): ${lowerTouches}`);
+    console.log(`   Current RSI: ${rsiValues[rsiValues.length - 1]?.rsi || 'N/A'}`);
+    
+    // Показываем все RSI значения для отладки
+    const allRSIValues = rsiValues.map(item => ({
+      timestamp: new Date(item.timestamp).toLocaleString('ru-RU'),
+      rsi: item.rsi,
+      price: item.price
+    }));
+    
+    console.log(`   All RSI values:`, allRSIValues.slice(-10)); // Последние 10 значений
+
+    res.json({
+      symbol: symbol,
+      period: '24h',
+      timeframe: '3m',
+      totalCandles: data.length,
+      rsiValues: rsiValues.length,
+      upperTouches: upperTouches,
+      lowerTouches: lowerTouches,
+      lastUpperTouch: lastUpperTouch,
+      lastLowerTouch: lastLowerTouch,
+      currentRSI: rsiValues[rsiValues.length - 1]?.rsi || null,
+      debug: {
+        allRSIValues: allRSIValues.slice(-20), // Последние 20 значений для отладки
+        upperTouchesDetails: rsiValues.filter(item => item.rsi >= 75),
+        lowerTouchesDetails: rsiValues.filter(item => item.rsi <= 25)
+      }
+    });
+    
+  } catch (error) {
+    console.error(`❌ Ошибка анализа RSI для ${req.params.symbol}:`, error);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+// Функция расчета RSI для исторических данных
+function calculateRSIForPeriod(prices, period = 14) {
+  if (prices.length < period + 1) return null;
+  
+  let gains = [];
+  let losses = [];
+  
+  // Рассчитываем изменения цен
+  for (let i = 1; i < prices.length; i++) {
+    const change = prices[i] - prices[i - 1];
+    gains.push(change > 0 ? change : 0);
+    losses.push(change < 0 ? -change : 0);
+  }
+  
+  // Первый расчет средних значений (простое среднее)
+  let avgGain = 0;
+  let avgLoss = 0;
+  
+  for (let i = 0; i < period; i++) {
+    avgGain += gains[i];
+    avgLoss += losses[i];
+  }
+  
+  avgGain /= period;
+  avgLoss /= period;
+  
+  // Сглаживание по Wilder (экспоненциальное сглаживание)
+  for (let i = period; i < gains.length; i++) {
+    avgGain = ((avgGain * (period - 1)) + gains[i]) / period;
+    avgLoss = ((avgLoss * (period - 1)) + losses[i]) / period;
+  }
+  
+  if (avgLoss === 0) return 100;
+  
+  const rs = avgGain / avgLoss;
+  const rsi = 100 - (100 / (1 + rs));
+  
+  return Math.max(0, Math.min(100, Math.round(rsi * 100) / 100));
+}
+
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`🚀 Сервер запущен: http://localhost:${PORT}`);

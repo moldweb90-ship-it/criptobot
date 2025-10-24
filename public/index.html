@@ -2521,9 +2521,9 @@
           <div class="filter-info">
             <div class="filter-name">Консервативная стратегия</div>
             <div class="filter-desc">
-              <div class="filter-rule">70%+: TP 0.29%, SL 0.17%</div>
-              <div class="filter-rule">55-69%: TP 0.25%, SL 0.14%</div>
-              <div class="filter-rule">R:R = 1:1.7 (консервативно!)</div>
+              <div class="filter-rule">70%+: TP 0.32%, SL 0.30%</div>
+              <div class="filter-rule">55-69%: TP 0.29%, SL 0.25%</div>
+              <div class="filter-rule">R:R = 1:1.1 (сбалансированно!)</div>
             </div>
           </div>
         </div>
@@ -2663,12 +2663,12 @@
     const FUTURES_TAKER_FEE = 0.0004; // 0.04% комиссия taker
     const POSITION_SIZE_USD = 100; // Размер позиции в долларах
     
-    // Функция расчета TP/SL по уверенности (Консервативная стратегия)
+    // Функция расчета TP/SL по уверенности (Обновленная стратегия)
     function calculateTPSL(confidence) {
       if (confidence >= 70) {
-        return { tp: 0.29, sl: 0.17 };  // TP 0.29%, SL 0.17% → 1:1.71
+        return { tp: 0.32, sl: 0.30 };  // TP 0.32%, SL 0.30% → 1:1.07
       } else if (confidence >= 55) {
-        return { tp: 0.25, sl: 0.14 };  // TP 0.25%, SL 0.14% → 1:1.79
+        return { tp: 0.29, sl: 0.25 };  // TP 0.29%, SL 0.25% → 1:1.16
       } else {
         return null; // Не торгуем ниже 55%
       }
@@ -3141,8 +3141,21 @@
         return;
       }
       
-      // Открываем позицию
-      const direction = dealData.direction === 'buy' ? 'LONG' : 'SHORT';
+      // ЗЕРКАЛЬНАЯ ТОРГОВЛЯ - ИНВЕРСИЯ НАПРАВЛЕНИЯ!
+      let direction;
+      if (dealData.direction === 'buy') {
+        direction = 'SHORT'; // buy -> SHORT
+        console.log(`🔄 ИНВЕРСИЯ: buy сигнал → SHORT позиция`);
+      } else {
+        direction = 'LONG'; // sell -> LONG  
+        console.log(`🔄 ИНВЕРСИЯ: sell сигнал → LONG позиция`);
+      }
+      
+      console.log(`🔄 ЗЕРКАЛЬНАЯ ТОРГОВЛЯ: ${symbol}`);
+      console.log(`   Исходный сигнал: ${dealData.direction}`);
+      console.log(`   Инверсное направление: ${direction}`);
+      console.log(`   Цена входа: $${entryPrice.toFixed(4)}`);
+      
       const position = openPosition(symbol, direction, entryPrice, POSITION_SIZE_USD, dealData.confidence);
       
       if (position) {
