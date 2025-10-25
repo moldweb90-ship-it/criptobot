@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RSI Strategy - Crypto Bot</title>
+  <title>RSI 40-50 Strategy - Crypto Bot</title>
   <style>
     * {
       margin: 0;
@@ -33,6 +33,18 @@
       font-size: 2.5rem;
       margin-bottom: 10px;
       text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .header .strategy-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 10px;
+      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
     }
 
     .header p {
@@ -1606,7 +1618,7 @@
           </div>
         </a>
         
-        <a href="/rsi" class="burger-menu-item active">
+        <a href="/rsi" class="burger-menu-item">
           <div class="burger-menu-icon">📊</div>
           <div>
             <div class="burger-menu-text">RSI стратегия</div>
@@ -1622,7 +1634,7 @@
           </div>
         </a>
         
-        <a href="/rsi-40-50" class="burger-menu-item">
+        <a href="/rsi-40-50" class="burger-menu-item active">
           <div class="burger-menu-icon">📊</div>
           <div>
             <div class="burger-menu-text">RSI 40-50</div>
@@ -1712,8 +1724,9 @@
 
   <div class="container">
     <div class="header">
-      <h1>📊 RSI Strategy</h1>
-      <p>Торговля по экстремумам RSI (Relative Strength Index)</p>
+      <h1>📊 RSI 40-50 Strategy</h1>
+      <p>Торговля LONG/SHORT позициями на основе RSI индикатора (3-минутный таймфрейм)</p>
+      <div class="strategy-badge">📈📉 RSI 40-50</div>
     </div>
 
     <!-- Открытые сделки RSI -->
@@ -1723,7 +1736,7 @@
         <div class="no-positions">
           <div class="no-positions-icon">📊</div>
           <div class="no-positions-text">Нет открытых сделок</div>
-          <div class="no-positions-desc">Сделки появятся при RSI ≤ 29 (LONG) или RSI ≥ 75 (SHORT)</div>
+          <div class="no-positions-desc">Сделки появятся при RSI 40-42 (LONG) или RSI 59-61 (SHORT)</div>
         </div>
       </div>
     </div>
@@ -1818,7 +1831,7 @@
           💾 Данные автоматически сохраняются каждые 5 секунд
         </div>
         <button class="clear-btn" onclick="clearRSIData()" style="background: #f56565; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">
-          🗑️ Очистить все данные
+          🗑️ Очистить все данные RSI 40-50
         </button>
       </div>
     </div>
@@ -1829,9 +1842,9 @@
         <div class="rule-card long">
           <div class="rule-title">🟢 LONG сигнал</div>
           <div class="rule-desc">
-          RSI ≤ 29 (перепроданность)<br>
+          RSI 40-42 (перепроданность)<br>
             Моментальное открытие позиции<br>
-          TP: 0.37%, SL: 0.25%<br>
+          TP: 0.23%, SL: 0.16%<br>
           <strong>Сумма сделки: $100</strong><br>
           <strong>Средства блокируются до закрытия</strong>
           </div>
@@ -1839,9 +1852,9 @@
         <div class="rule-card short">
           <div class="rule-title">🔴 SHORT сигнал</div>
           <div class="rule-desc">
-            RSI ≥ 75 (перекупленность)<br>
+            RSI 59-61 (перекупленность)<br>
             Моментальное открытие позиции<br>
-            TP: 0.37%, SL: 0.25%<br>
+            TP: 0.23%, SL: 0.16%<br>
             <strong>Сумма сделки: $100</strong><br>
             <strong>Средства блокируются до закрытия</strong>
           </div>
@@ -1918,10 +1931,12 @@
     // Константы для RSI стратегии
     const FUTURES_TAKER_FEE = 0.0004; // 0.04% комиссия taker
     const POSITION_SIZE_USD = 100; // Размер позиции в долларах
-    const RSI_LONG_THRESHOLD = 29; // RSI для LONG (ТЕСТ: изменено с 25 на 29)
-    const RSI_SHORT_THRESHOLD = 75; // RSI для SHORT (изменено с 69 на 75)
+    const RSI_LONG_MIN = 40; // RSI минимум для LONG (включительно)
+    const RSI_LONG_MAX = 42; // RSI максимум для LONG (включительно)
+    const RSI_SHORT_MIN = 59; // RSI минимум для SHORT (включительно)
+    const RSI_SHORT_MAX = 61; // RSI максимум для SHORT (включительно)
     
-    // RSI торговые данные (отдельные от главной страницы)
+    // RSI торговые данные (отдельные от главной страницы и rsi.html)
     let rsiOpenPositions = [];
     let rsiClosedDeals = [];
     let rsiRealizedPnL = 0; // Реализованный PnL (баланс = 1000 + rsiRealizedPnL)
@@ -1960,7 +1975,7 @@
           enabledCoins: enabledCoins,
           lastSaved: Date.now()
         };
-        localStorage.setItem('rsiTradingData', JSON.stringify(data));
+        localStorage.setItem('rsi4050TradingData', JSON.stringify(data));
         console.log(`💾 RSI данные сохранены: ${rsiOpenPositions.length} позиций, ${rsiClosedDeals.length} сделок`);
       } catch (error) {
         console.error('❌ Ошибка сохранения RSI данных:', error);
@@ -1970,7 +1985,7 @@
     // Загрузка данных RSI из localStorage
     function loadRSIData() {
       try {
-        const savedData = localStorage.getItem('rsiTradingData');
+        const savedData = localStorage.getItem('rsi4050TradingData');
         if (savedData) {
           const data = JSON.parse(savedData);
           rsiOpenPositions = data.openPositions || [];
@@ -2095,7 +2110,7 @@
           <div class="no-positions">
             <div class="no-positions-icon">📊</div>
             <div class="no-positions-text">Нет открытых сделок</div>
-            <div class="no-positions-desc">Сделки появятся при RSI ≤ 29 (LONG) или RSI ≥ 75 (SHORT)</div>
+            <div class="no-positions-desc">Сделки появятся при RSI 40-42 (LONG) или RSI 59-61 (SHORT)</div>
           </div>
         `;
         return;
@@ -2364,11 +2379,11 @@
             
             // Обновляем сигнал
             signalEl.className = 'rsi-signal';
-            if (rsi <= RSI_LONG_THRESHOLD) {
+            if (rsi >= RSI_LONG_MIN && rsi <= RSI_LONG_MAX) {
               signalEl.textContent = '🟢 LONG';
               signalEl.classList.add('long');
               checkRSISignal(symbol, 'LONG', rsi);
-            } else if (rsi >= RSI_SHORT_THRESHOLD) {
+            } else if (rsi >= RSI_SHORT_MIN && rsi <= RSI_SHORT_MAX) {
               signalEl.textContent = '🔴 SHORT';
               signalEl.classList.add('short');
               checkRSISignal(symbol, 'SHORT', rsi);
@@ -2425,21 +2440,21 @@
       const volume = POSITION_SIZE_USD / entryPrice;
       const openCommission = 0; // БЕЗ КОМИССИЙ для тестирования
       
-      // RSI стратегия: TP 0.37%, SL 0.25%
+      // RSI 40-50 стратегия: TP 0.23%, SL 0.16%
       const tpPrice = direction === 'LONG' 
-        ? entryPrice * (1 + 0.37 / 100) 
-        : entryPrice * (1 - 0.37 / 100);
+        ? entryPrice * (1 + 0.23 / 100) 
+        : entryPrice * (1 - 0.23 / 100);
       const slPrice = direction === 'LONG' 
-        ? entryPrice * (1 - 0.25 / 100) 
-        : entryPrice * (1 + 0.25 / 100);
+        ? entryPrice * (1 - 0.16 / 100)
+        : entryPrice * (1 + 0.16 / 100);
       
       // ОТЛАДКА РАСЧЕТА TP/SL
       console.log(`🔍 ОТЛАДКА TP/SL для ${symbol} ${direction}:`);
       console.log(`   Вход: $${entryPrice.toFixed(4)}`);
-      console.log(`   TP: $${tpPrice.toFixed(4)} (${direction === 'LONG' ? '+' : '-'}0.37%)`);
-      console.log(`   SL: $${slPrice.toFixed(4)} (${direction === 'LONG' ? '-' : '+'}0.25%)`);
-      console.log(`   Проверка TP: ${entryPrice.toFixed(4)} * ${direction === 'LONG' ? '1.0037' : '0.9963'} = ${tpPrice.toFixed(4)}`);
-      console.log(`   Проверка SL: ${entryPrice.toFixed(4)} * ${direction === 'LONG' ? '0.9975' : '1.0025'} = ${slPrice.toFixed(4)}`);
+      console.log(`   TP: $${tpPrice.toFixed(4)} (${direction === 'LONG' ? '+' : '-'}0.23%)`);
+      console.log(`   SL: $${slPrice.toFixed(4)} (${direction === 'LONG' ? '-' : '+'}0.16%)`);
+      console.log(`   Проверка TP: ${entryPrice.toFixed(4)} * ${direction === 'LONG' ? '1.0023' : '0.9977'} = ${tpPrice.toFixed(4)}`);
+      console.log(`   Проверка SL: ${entryPrice.toFixed(4)} * ${direction === 'LONG' ? '0.9984' : '1.0016'} = ${slPrice.toFixed(4)}`);
       
       const position = {
         id: Date.now(),
@@ -2471,8 +2486,8 @@
       console.log(`🚀 RSI ПОЗИЦИЯ: ${symbol} ${direction} @ $${entryPrice.toFixed(5)}`);
       console.log(`   RSI: ${rsi.toFixed(1)}, TP: $${tpPrice.toFixed(5)}, SL: $${slPrice.toFixed(5)}`);
       console.log(`   Объем: ${volume.toFixed(6)}, Сумма: $${POSITION_SIZE_USD.toFixed(2)}`);
-      console.log(`   Планируемый TP: +$${(POSITION_SIZE_USD * 0.37 / 100).toFixed(2)}`);
-      console.log(`   Планируемый SL: -$${(POSITION_SIZE_USD * 0.25 / 100).toFixed(2)}`);
+      console.log(`   Планируемый TP: +$${(POSITION_SIZE_USD * 0.23 / 100).toFixed(2)}`);
+      console.log(`   Планируемый SL: -$${(POSITION_SIZE_USD * 0.16 / 100).toFixed(2)}`);
       
       updateRSIPositions();
       updateRSIBalance();
@@ -2687,7 +2702,7 @@
         rsiLastPrices = {};
         rsiCurrentPage = 1;
         
-        localStorage.removeItem('rsiTradingData');
+        localStorage.removeItem('rsi4050TradingData');
         
         updateRSIBalance();
         updateRSIPositions();

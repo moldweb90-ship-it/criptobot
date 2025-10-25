@@ -1466,6 +1466,18 @@ app.get('/rsi', (req, res) => {
   res.sendFile('rsi.html', { root: 'public' });
 });
 
+app.get('/rsi-long', (req, res) => {
+  res.sendFile('rsi-long.html', { root: 'public' });
+});
+
+app.get('/rsi-40-50', (req, res) => {
+  res.sendFile('rsi-40-50.html', { root: 'public' });
+});
+
+app.get('/rsi-max', (req, res) => {
+  res.sendFile('rsi-max.html', { root: 'public' });
+});
+
 // API endpoint для анализа RSI экстремумов за 24 часа
 app.get('/api/rsi-analysis/:symbol', async (req, res) => {
   try {

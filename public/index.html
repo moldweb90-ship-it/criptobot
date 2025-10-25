@@ -2222,6 +2222,30 @@
               </div>
             </a>
             
+            <a href="/rsi-long" class="burger-menu-item">
+              <div class="burger-menu-icon">📈</div>
+              <div>
+                <div class="burger-menu-text">RSI Long Only</div>
+                <div class="burger-menu-desc">Только лонги</div>
+              </div>
+            </a>
+            
+            <a href="/rsi-40-50" class="burger-menu-item">
+              <div class="burger-menu-icon">📊</div>
+              <div>
+                <div class="burger-menu-text">RSI 40-50</div>
+                <div class="burger-menu-desc">LONG/SHORT</div>
+              </div>
+            </a>
+            
+            <a href="/rsi-max" class="burger-menu-item">
+              <div class="burger-menu-icon">🚀</div>
+              <div>
+                <div class="burger-menu-text">RSI Max</div>
+                <div class="burger-menu-desc">Большие движения</div>
+              </div>
+            </a>
+            
             <div class="burger-menu-divider"></div>
             
             <a href="#" class="burger-menu-item">
@@ -3141,19 +3165,20 @@
         return;
       }
       
-      // ЗЕРКАЛЬНАЯ ТОРГОВЛЯ - ИНВЕРСИЯ НАПРАВЛЕНИЯ!
+      // ТОЛЬКО ЛОНГИ - но с инверсией!
       let direction;
-      if (dealData.direction === 'buy') {
-        direction = 'SHORT'; // buy -> SHORT
-        console.log(`🔄 ИНВЕРСИЯ: buy сигнал → SHORT позиция`);
+      if (dealData.direction === 'sell') {
+        direction = 'LONG'; // sell сигнал → LONG позиция (инверсия)
+        console.log(`🟢 LONG ONLY: sell сигнал → LONG позиция (инверсия)`);
       } else {
-        direction = 'LONG'; // sell -> LONG  
-        console.log(`🔄 ИНВЕРСИЯ: sell сигнал → LONG позиция`);
+        // buy сигналы игнорируем - не торгуем
+        console.log(`❌ LONG ONLY: buy сигнал игнорируется`);
+        return;
       }
       
-      console.log(`🔄 ЗЕРКАЛЬНАЯ ТОРГОВЛЯ: ${symbol}`);
+      console.log(`🟢 LONG ONLY ТОРГОВЛЯ: ${symbol}`);
       console.log(`   Исходный сигнал: ${dealData.direction}`);
-      console.log(`   Инверсное направление: ${direction}`);
+      console.log(`   Направление: ${direction}`);
       console.log(`   Цена входа: $${entryPrice.toFixed(4)}`);
       
       const position = openPosition(symbol, direction, entryPrice, POSITION_SIZE_USD, dealData.confidence);
@@ -4438,13 +4463,13 @@
         confidence = longScore;
         tpPercent = 0.25;
         slPercent = -0.13;
-      } else if (shortScore >= 60) {
+      } else if (false) { // SHORT отключен - только лонги
         signal = 'SELL';
         confidence = shortScore;
         tpPercent = -0.25;
         slPercent = 0.15;
       } else {
-        confidence = Math.max(longScore, shortScore);
+        confidence = longScore; // Только лонги
       }
 
       console.log(`🎯 ${symbol} Signal: ${signal}, Confidence: ${confidence}%`);
